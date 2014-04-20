@@ -24,11 +24,11 @@ BIN_DIR = bin/
 
 INCLUDE_DIR = $(SRC_DIR)/include
 
-CLOC = 0xF080
+CLOC = 0xF000
 DLOC = 0x0000
 
 # Compilation / Assembly / Linking flags
-CCC_FLAGS = -c -mz80 --code-loc $(CLOC) --data-loc $(DLOC) -D__SDCC__=1 -I $(INCLUDE_DIR)
+CCC_FLAGS = -c -mz80 --code-loc $(CLOC) --data-loc $(DLOC) --no-std-crt0 -D__SDCC__=1 -I $(INCLUDE_DIR)
 CAS_FLAGS = -plosff 
 CLD_FLAGS = 
 
@@ -41,7 +41,7 @@ $(BIN_DIR)/$(TARGET).hex:	$(BIN_DIR)/$(TARGET).ihx
 	$(QUIET)$(ECHO) Generating $(TARGET).ihx
 	$(QUIET)$(COPY)	$(BIN_DIR)/$(TARGET).ihx $(BIN_DIR)/$(TARGET).hex
 
-$(BIN_DIR)/$(TARGET).ihx:	$(BIN_DIR)/$(TARGET).rel $(BIN_DIR)/$(TARGET).arf $(COMPILER_LIBS)/crt0.rel 
+$(BIN_DIR)/$(TARGET).ihx:	$(BIN_DIR)/$(TARGET).rel $(BIN_DIR)/$(TARGET).arf 
 	$(CLD) $(CLD_FLAGS) -nf $(BIN_DIR)/$(TARGET).arf
 	$(QUIET)$(MOVE) $(TARGET).ihx $(BIN_DIR)
 	$(QUIET)$(MOVE) $(TARGET).map $(BIN_DIR)
@@ -56,7 +56,6 @@ $(BIN_DIR)/$(TARGET).arf:
 	$(QUIET)$(ECHO) -i $(TARGET).ihx >> $(BIN_DIR)/$(TARGET).arf
 	$(QUIET)$(ECHO) -k $(COMPILER_LIBS) >> $(BIN_DIR)/$(TARGET).arf
 	$(QUIET)$(ECHO) -l z80 >> $(BIN_DIR)/$(TARGET).arf
-	$(QUIET)$(ECHO) $(COMPILER_LIBS)/crt0.rel >> $(BIN_DIR)/$(TARGET).arf
 	$(QUIET)$(ECHO) $(BIN_DIR)/$(TARGET).rel >> $(BIN_DIR)/$(TARGET).arf
 	$(QUIET)$(ECHO) -e >> $(BIN_DIR)/$(TARGET).arf
 
