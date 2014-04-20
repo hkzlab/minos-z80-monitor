@@ -41,7 +41,7 @@ $(BIN_DIR)/$(TARGET).hex:	$(BIN_DIR)/$(TARGET).ihx
 	$(QUIET)$(ECHO) Generating $(TARGET).ihx
 	$(QUIET)$(COPY)	$(BIN_DIR)/$(TARGET).ihx $(BIN_DIR)/$(TARGET).hex
 
-$(BIN_DIR)/$(TARGET).ihx:	$(BIN_DIR)/$(TARGET).rel $(BIN_DIR)/$(TARGET).arf 
+$(BIN_DIR)/$(TARGET).ihx:	$(BIN_DIR)/$(TARGET).rel $(BIN_DIR)/$(TARGET).arf $(BIN_DIR)/xmodem.rel $(BIN_DIR)/console.rel
 	$(CLD) $(CLD_FLAGS) -nf $(BIN_DIR)/$(TARGET).arf
 	$(QUIET)$(MOVE) $(TARGET).ihx $(BIN_DIR)
 	$(QUIET)$(MOVE) $(TARGET).map $(BIN_DIR)
@@ -50,6 +50,12 @@ $(BIN_DIR)/$(TARGET).ihx:	$(BIN_DIR)/$(TARGET).rel $(BIN_DIR)/$(TARGET).arf
 $(BIN_DIR)/$(TARGET).rel: $(SRC_DIR)/$(TARGET).c
 	$(CCC) $(CCC_FLAGS) -o $(BIN_DIR) $(SRC_DIR)/$(TARGET).c
 
+$(BIN_DIR)/xmodem.rel: $(SRC_DIR)/io/xmodem.c
+	$(CCC) $(CCC_FLAGS) -o $(BIN_DIR) $(SRC_DIR)/io/xmodem.c
+
+$(BIN_DIR)/console.rel: $(SRC_DIR)/io/console.c
+	$(CCC) $(CCC_FLAGS) -o $(BIN_DIR) $(SRC_DIR)/io/console.c
+
 $(BIN_DIR)/$(TARGET).arf:
 	$(QUIET)$(ECHO) Generating $(TARGET).arf
 	$(QUIET)$(ECHO) -mjx > $(BIN_DIR)/$(TARGET).arf
@@ -57,6 +63,8 @@ $(BIN_DIR)/$(TARGET).arf:
 	$(QUIET)$(ECHO) -k $(COMPILER_LIBS) >> $(BIN_DIR)/$(TARGET).arf
 	$(QUIET)$(ECHO) -l z80 >> $(BIN_DIR)/$(TARGET).arf
 	$(QUIET)$(ECHO) $(BIN_DIR)/$(TARGET).rel >> $(BIN_DIR)/$(TARGET).arf
+	$(QUIET)$(ECHO) $(BIN_DIR)/console.rel >> $(BIN_DIR)/console.arf
+	$(QUIET)$(ECHO) $(BIN_DIR)/xmodem.rel >> $(BIN_DIR)/xmodem.arf
 	$(QUIET)$(ECHO) -e >> $(BIN_DIR)/$(TARGET).arf
 
 clean:
