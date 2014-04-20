@@ -5,11 +5,10 @@
 void sys_init(void) {
 }
 
-/*
-static __sfr __at 0x63 IoPPICtrl;
-*/
+void main(void) {
+	// Do basic system initialization
+	sys_init();
 
-int main() {
-	return 1;
+	while(1);
 }
 
