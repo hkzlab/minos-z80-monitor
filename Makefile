@@ -17,6 +17,11 @@ CC = gcc
 ECHO = echo
 COPY = cp
 MOVE = mv
+H2B = hex2bin
+
+# Tool flags
+# Pad the image to 2048 bytes
+H2B_FLAGS = -s 0 -l 800
 
 # Project directories
 SRC_DIR = src/
@@ -35,7 +40,12 @@ CLD_FLAGS =
 # Here begins the actual creation of destination files
 TARGET = main
 
-all: $(BIN_DIR)/$(TARGET).hex
+#all: $(BIN_DIR)/$(TARGET).hex
+all: $(BIN_DIR)/$(TARGET).bin
+
+$(BIN_DIR)/$(TARGET).bin:	$(BIN_DIR)/$(TARGET).hex
+	$(QUIET)$(ECHO) Converting $(TARGET).hex to bin
+	$(H2B) $(H2B_FLAGS) $(BIN_DIR)/$(TARGET).hex
 
 $(BIN_DIR)/$(TARGET).hex:	$(BIN_DIR)/$(TARGET).ihx
 	$(QUIET)$(ECHO) Generating $(TARGET).ihx
