@@ -52,14 +52,19 @@ $(BIN_DIR)/$(TARGET).hex:	$(BIN_DIR)/$(TARGET).ihx
 	$(QUIET)$(ECHO) Generating $(TARGET).ihx
 	$(QUIET)$(COPY)	$(BIN_DIR)/$(TARGET).ihx $(BIN_DIR)/$(TARGET).hex
 
-$(BIN_DIR)/$(TARGET).ihx:	$(BIN_DIR)/main.rel $(BIN_DIR)/xmodem.rel $(BIN_DIR)/console.rel $(BIN_DIR)/n8vem_serio.rel $(BIN_DIR)/n8vem_conio.rel
-	$(CCC) $(CLD_FLAGS) $(CCC_FLAGS) $(BIN_DIR)/main.rel $(BIN_DIR)/xmodem.rel $(BIN_DIR)/console.rel $(BIN_DIR)/n8vem_serio.rel $(BIN_DIR)/n8vem_conio.rel -o $(BIN_DIR)/$(TARGET).ihx
-#	$(QUIET)$(MOVE) $(TARGET).ihx $(BIN_DIR)
-#	$(QUIET)$(MOVE) $(TARGET).map $(BIN_DIR)
-#	$(QUIET)$(MOVE) $(TARGET).noi $(BIN_DIR)
+$(BIN_DIR)/$(TARGET).ihx:	$(BIN_DIR)/main.rel $(BIN_DIR)/xmodem.rel \
+							$(BIN_DIR)/console.rel $(BIN_DIR)/n8vem_serio.rel \
+							$(BIN_DIR)/n8vem_conio.rel $(BIN_DIR)/utilities.rel
+	$(CCC) $(CLD_FLAGS) $(CCC_FLAGS) $(BIN_DIR)/main.rel $(BIN_DIR)/xmodem.rel \
+		$(BIN_DIR)/console.rel $(BIN_DIR)/n8vem_serio.rel \
+		$(BIN_DIR)/n8vem_conio.rel $(BIN_DIR)/utilities.rel \
+		-o $(BIN_DIR)/$(TARGET).ihx
 
 $(BIN_DIR)/main.rel: $(SRC_DIR)/main.c
 	$(CCC) $(CCC_FLAGS) -c -o $(BIN_DIR) $(SRC_DIR)/main.c
+
+$(BIN_DIR)/utilities.rel: $(SRC_DIR)/utilities.c
+	$(CCC) $(CCC_FLAGS) -c -o $(BIN_DIR) $(SRC_DIR)/utilities.c
 
 $(BIN_DIR)/xmodem.rel: $(SRC_DIR)/io/xmodem.c
 	$(CCC) $(CCC_FLAGS) -c -o $(BIN_DIR) $(SRC_DIR)/io/xmodem.c
