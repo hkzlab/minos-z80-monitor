@@ -1,39 +1,40 @@
+;; Custom CRT0 for ITHACA AUDIO Z80 CPU monitor
+;; Taken from SDCC
+
 	.module crt0
 	.globl	_main
 
 	.globl  l__INITIALIZER
-    .globl  s__INITIALIZED
-    .globl  s__INITIALIZER
+	.globl  s__INITIALIZED
+ 	.globl  s__INITIALIZER
 
 	.area	_HEADER (ABS)
 	;; Reset vector
 	.org 	0xF000
 	jp	init
-
-	.org	0x08
+	.org	0xF008
 	reti
-	.org	0x10
+	.org	0xF010
 	reti
-	.org	0x18
+	.org	0xF018
 	reti
-	.org	0x20
+	.org	0xF020
 	reti
-	.org	0x28
+	.org	0xF028
 	reti
-	.org	0x30
+	.org	0xF030
 	reti
-	.org	0x38
+	.org	0xF038
 	reti
-
-	.org	0x100
+	.org	0xF040
 init:
 	;; Stack at the top of memory.
 	ld	sp,#0xEFFF
 
-        ;; Initialise global variables
-        call    gsinit
+    ;; Initialise global variables
+    call	gsinit
 	call	_main
-	jp	_exit
+	jp		_exit
 
 	;; Ordering of segments for the linker.
 	.area	_HOME

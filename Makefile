@@ -27,16 +27,16 @@ BIN_DIR = bin/
 
 INCLUDES = -I$(SRC_DIR)/include -I$(SRC_DIR)
 
-CLOC = 0xF000
-CSIZ = 0x400
-#CSIZ = 0x800
+CLOC = 0xF080
+CSIZ = 0x380
+#CSIZ = 0x780
 DLOC = 0x8000
 
 # Compilation / Assembly / Linking flags
 CUST_DEFINES = -D__USE_N8VEM_CONSOLE__ -D__USE_N8VEM_SERIO__
 CCC_FLAGS = -mz80 -D__SDCC__=1 -D__CLOC__=$(CLOC) -D__DLOC__=$(DLOC) $(CUST_DEFINES) $(INCLUDES)
 CAS_FLAGS = -plosff 
-CLD_FLAGS = --code-loc $(CLOC) --data-loc $(DLOC) --code-size $(CSIZ) --out-fmt-ihx
+CLD_FLAGS = --code-loc $(CLOC) --data-loc $(DLOC) --code-size $(CSIZ) --no-std-crt0 --out-fmt-ihx
 
 # Here begins the actual creation of destination files
 TARGET = monitor
@@ -52,13 +52,16 @@ $(BIN_DIR)/$(TARGET).hex:	$(BIN_DIR)/$(TARGET).ihx
 	$(QUIET)$(ECHO) Generating $(TARGET).ihx
 	$(QUIET)$(COPY)	$(BIN_DIR)/$(TARGET).ihx $(BIN_DIR)/$(TARGET).hex
 
-$(BIN_DIR)/$(TARGET).ihx:	$(BIN_DIR)/main.rel $(BIN_DIR)/xmodem.rel \
+$(BIN_DIR)/$(TARGET).ihx:	$(BIN_DIR)/crt0.rel $(BIN_DIR)/main.rel $(BIN_DIR)/xmodem.rel \
 							$(BIN_DIR)/console.rel $(BIN_DIR)/n8vem_serio.rel \
 							$(BIN_DIR)/n8vem_conio.rel $(BIN_DIR)/utilities.rel
-	$(CCC) $(CLD_FLAGS) $(CCC_FLAGS) $(BIN_DIR)/main.rel $(BIN_DIR)/xmodem.rel \
+	$(CCC) $(CLD_FLAGS) $(CCC_FLAGS) $(BIN_DIR)/crt0.rel $(BIN_DIR)/main.rel $(BIN_DIR)/xmodem.rel \
 		$(BIN_DIR)/console.rel $(BIN_DIR)/n8vem_serio.rel \
 		$(BIN_DIR)/n8vem_conio.rel $(BIN_DIR)/utilities.rel \
 		-o $(BIN_DIR)/$(TARGET).ihx
+
+$(BIN_DIR)/crt0.rel: $(SRC_DIR)/crt0.s
+	$(CAS) $(CAS_FLAGS) -c -o $(BIN_DIR)/crt0.rel $(SRC_DIR)/crt0.s
 
 $(BIN_DIR)/main.rel: $(SRC_DIR)/main.c
 	$(CCC) $(CCC_FLAGS) -c -o $(BIN_DIR) $(SRC_DIR)/main.c
