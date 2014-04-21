@@ -25,14 +25,15 @@ H2B_FLAGS = -s F000 -l 400
 SRC_DIR = src/
 BIN_DIR = bin/
 
-INCLUDE_DIR = $(SRC_DIR)/include
+INCLUDES = -I$(SRC_DIR)/include -I$(SRC_DIR)
 
 CLOC = 0xF000
 CSIZ = 0x400
 DLOC = 0x8000
 
 # Compilation / Assembly / Linking flags
-CCC_FLAGS = -mz80 -D__SDCC__=1 -D__CLOC__=$(CLOC) -D__DLOC__=$(DLOC) -I $(INCLUDE_DIR)
+CUST_DEFINES = -D__USE_N8VEM_CONSOLE__
+CCC_FLAGS = -mz80 -D__SDCC__=1 -D__CLOC__=$(CLOC) -D__DLOC__=$(DLOC) $(CUST_DEFINES) $(INCLUDES)
 CAS_FLAGS = -plosff 
 CLD_FLAGS = --code-loc $(CLOC) --data-loc $(DLOC) --code-size $(CSIZ) --out-fmt-ihx
 
