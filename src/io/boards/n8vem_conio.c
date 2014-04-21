@@ -9,12 +9,12 @@ void n8vem_conio_init(void) {
 	return;
 }
 
-uint8_t n8vem_conio_getch(void) {
+char n8vem_conio_getch(void) {
 	while(!(PropCIO_STAT & 0x02)); // Loop until we are ready to get the data...
 	return PropCIO_DATA;
 }
 
-void n8vem_conio_putch(uint8_t ch) {
+void n8vem_conio_putch(char ch) {
 	while(!(PropCIO_STAT & 0x04)); // Loop until we are ready to send the data...
 	PropCIO_DATA = ch; // Send the data
 }

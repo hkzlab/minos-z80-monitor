@@ -5,7 +5,7 @@
 
 void n8vem_conio_init(void);
 
-uint8_t n8vem_conio_getch(void);
-void n8vem_conio_putch(uint8_t ch);
+char n8vem_conio_getch(void);
+void n8vem_conio_putch(char ch);
 
 #endif /* _N8VEMCONIO_HEADER_ */
