@@ -27,6 +27,8 @@ void main(void) {
 	// Do basic system initialization
 	sys_init();
 
+	printf("%s\n", title_str);
+
 	while(1);
 }
 
