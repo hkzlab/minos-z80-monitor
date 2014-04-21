@@ -42,6 +42,7 @@ void main(void) {
 	}
 }
 
+/*** Monitor Commands ***/
 
 void monitor_outp(uint8_t port, uint8_t data) {
 	port; data; // Silence the warning...
@@ -61,4 +62,10 @@ void monitor_outp(uint8_t port, uint8_t data) {
 
 		pop bc
 	__endasm;
+}
+
+uint8_t monitor_inp(uint8_t port) {
+	port;
+
+	return 0;
 }

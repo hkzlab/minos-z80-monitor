@@ -27,9 +27,9 @@ BIN_DIR = bin/
 
 INCLUDES = -I$(SRC_DIR)/include -I$(SRC_DIR)
 
-CLOC = 0xF080
-CSIZ = 0x380
-#CSIZ = 0x780
+CLOC = 0xF070
+CSIZ = 0x390
+#CSIZ = 0x790
 DLOC = 0x8000
 
 # Compilation / Assembly / Linking flags
