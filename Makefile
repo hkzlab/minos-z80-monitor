@@ -29,10 +29,11 @@ INCLUDES = -I$(SRC_DIR)/include -I$(SRC_DIR)
 
 CLOC = 0xF000
 CSIZ = 0x400
+#CSIZ = 0x800
 DLOC = 0x8000
 
 # Compilation / Assembly / Linking flags
-CUST_DEFINES = -D__USE_N8VEM_CONSOLE__
+CUST_DEFINES = -D__USE_N8VEM_CONSOLE__ -D__USE_N8VEM_SERIO__
 CCC_FLAGS = -mz80 -D__SDCC__=1 -D__CLOC__=$(CLOC) -D__DLOC__=$(DLOC) $(CUST_DEFINES) $(INCLUDES)
 CAS_FLAGS = -plosff 
 CLD_FLAGS = --code-loc $(CLOC) --data-loc $(DLOC) --code-size $(CSIZ) --out-fmt-ihx

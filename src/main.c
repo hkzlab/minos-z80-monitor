@@ -3,16 +3,18 @@
 #include <string.h>
 
 #include <common_datatypes.h>
+#include <io/console.h>
 
 #ifdef __USE_N8VEM_CONSOLE__
 #include <io/boards/n8vem_conio.h>
 #endif
 
-static const char title_str[] = "ITHACA AUDIO Z80 CPU BOARD";
+#ifdef __USE_N8VEM_SERIO__
+#include <io/boards/n8vem_serio.h>
+#endif
 
-// We need to implement this for stdio...
-void putchar(char ch);
-char getchar(void);
+static const char title_str[] = "ITHACA AUDIO Z80 CPU BOARD\n";
+
 
 void sys_init(void) {
 	// Cleanup the ram segment used for the monitor
@@ -21,26 +23,18 @@ void sys_init(void) {
 #ifdef __USE_N8VEM_CONSOLE__
 	n8vem_conio_init();
 #endif
+
+#ifdef __USE_N8VEM_SERIO__
+	n8vem_serio_init();
+#endif
 }
 
 void main(void) {
 	// Do basic system initialization
 	sys_init();
 
-	printf("%s\n", title_str);
+	console_printString(title_str);
 
 	while(1);
-}
-
-void putchar(char ch) {
-#ifdef __USE_N8VEM_CONSOLE__
-	n8vem_conio_putch(ch);
-#endif
-}
-
-char getchar(void) {
-#ifdef __USE_N8VEM_CONSOLE__
-	return n8vem_conio_getch();
-#endif
 }
 
