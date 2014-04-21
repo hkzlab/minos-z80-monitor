@@ -18,7 +18,8 @@ H2B = hex2bin
 
 # Tool flags
 # Pad the image to 2048 bytes
-H2B_FLAGS = -s F000 -l F800
+#H2B_FLAGS = -s F000 -l 800
+H2B_FLAGS = -s F000 -l 400
 
 # Project directories
 SRC_DIR = src/
@@ -27,15 +28,16 @@ BIN_DIR = bin/
 INCLUDE_DIR = $(SRC_DIR)/include
 
 CLOC = 0xF000
+CSIZ = 0x400
 DLOC = 0x8000
 
 # Compilation / Assembly / Linking flags
-CCC_FLAGS = -c -mz80 -D__SDCC__=1 -D__CLOC__=$(CLOC) -D__DLOC__=$(DLOC) -I $(INCLUDE_DIR)
+CCC_FLAGS = -mz80 -D__SDCC__=1 -D__CLOC__=$(CLOC) -D__DLOC__=$(DLOC) -I $(INCLUDE_DIR)
 CAS_FLAGS = -plosff 
-CLD_FLAGS = 
+CLD_FLAGS = --code-loc $(CLOC) --data-loc $(DLOC) --code-size $(CSIZ) --out-fmt-ihx
 
 # Here begins the actual creation of destination files
-TARGET = main
+TARGET = monitor
 
 #all: $(BIN_DIR)/$(TARGET).hex
 all: $(BIN_DIR)/$(TARGET).bin
@@ -48,43 +50,26 @@ $(BIN_DIR)/$(TARGET).hex:	$(BIN_DIR)/$(TARGET).ihx
 	$(QUIET)$(ECHO) Generating $(TARGET).ihx
 	$(QUIET)$(COPY)	$(BIN_DIR)/$(TARGET).ihx $(BIN_DIR)/$(TARGET).hex
 
-$(BIN_DIR)/$(TARGET).ihx:	$(BIN_DIR)/$(TARGET).rel $(BIN_DIR)/$(TARGET).arf \
-		$(BIN_DIR)/xmodem.rel $(BIN_DIR)/console.rel $(BIN_DIR)/n8vem_serio.rel $(BIN_DIR)/n8vem_conio.rel
-	$(CLD) $(CLD_FLAGS) -nf $(BIN_DIR)/$(TARGET).arf
-	$(QUIET)$(MOVE) $(TARGET).ihx $(BIN_DIR)
-	$(QUIET)$(MOVE) $(TARGET).map $(BIN_DIR)
-	$(QUIET)$(MOVE) $(TARGET).noi $(BIN_DIR)
+$(BIN_DIR)/$(TARGET).ihx:	$(BIN_DIR)/main.rel $(BIN_DIR)/xmodem.rel $(BIN_DIR)/console.rel $(BIN_DIR)/n8vem_serio.rel $(BIN_DIR)/n8vem_conio.rel
+	$(CCC) $(CLD_FLAGS) $(CCC_FLAGS) $(BIN_DIR)/main.rel $(BIN_DIR)/xmodem.rel $(BIN_DIR)/console.rel $(BIN_DIR)/n8vem_serio.rel $(BIN_DIR)/n8vem_conio.rel -o $(BIN_DIR)/$(TARGET).ihx
+#	$(QUIET)$(MOVE) $(TARGET).ihx $(BIN_DIR)
+#	$(QUIET)$(MOVE) $(TARGET).map $(BIN_DIR)
+#	$(QUIET)$(MOVE) $(TARGET).noi $(BIN_DIR)
 
-$(BIN_DIR)/$(TARGET).rel: $(SRC_DIR)/$(TARGET).c
-	$(CCC) $(CCC_FLAGS) -o $(BIN_DIR) $(SRC_DIR)/$(TARGET).c
+$(BIN_DIR)/main.rel: $(SRC_DIR)/main.c
+	$(CCC) $(CCC_FLAGS) -c -o $(BIN_DIR) $(SRC_DIR)/main.c
 
 $(BIN_DIR)/xmodem.rel: $(SRC_DIR)/io/xmodem.c
-	$(CCC) $(CCC_FLAGS) -o $(BIN_DIR) $(SRC_DIR)/io/xmodem.c
+	$(CCC) $(CCC_FLAGS) -c -o $(BIN_DIR) $(SRC_DIR)/io/xmodem.c
 
 $(BIN_DIR)/console.rel: $(SRC_DIR)/io/console.c
-	$(CCC) $(CCC_FLAGS) -o $(BIN_DIR) $(SRC_DIR)/io/console.c
+	$(CCC) $(CCC_FLAGS) -c -o $(BIN_DIR) $(SRC_DIR)/io/console.c
 
 $(BIN_DIR)/n8vem_serio.rel: $(SRC_DIR)/io/boards/n8vem_serio.c
-	$(CCC) $(CCC_FLAGS) -o $(BIN_DIR) $(SRC_DIR)/io/boards/n8vem_serio.c
+	$(CCC) $(CCC_FLAGS) -c -o $(BIN_DIR) $(SRC_DIR)/io/boards/n8vem_serio.c
 
 $(BIN_DIR)/n8vem_conio.rel: $(SRC_DIR)/io/boards/n8vem_conio.c
-	$(CCC) $(CCC_FLAGS) -o $(BIN_DIR) $(SRC_DIR)/io/boards/n8vem_conio.c
-
-$(BIN_DIR)/$(TARGET).arf:
-	$(QUIET)$(ECHO) Generating $(TARGET).arf
-	$(QUIET)$(ECHO) -mjx > $(BIN_DIR)/$(TARGET).arf
-	$(QUIET)$(ECHO) -b _CODE=$(CLOC) >> $(BIN_DIR)/$(TARGET).arf
-	$(QUIET)$(ECHO) -b _DATA=$(DLOC) >> $(BIN_DIR)/$(TARGET).arf
-	$(QUIET)$(ECHO) -i $(TARGET).ihx >> $(BIN_DIR)/$(TARGET).arf
-	$(QUIET)$(ECHO) -k $(COMPILER_LIBS) >> $(BIN_DIR)/$(TARGET).arf
-	$(QUIET)$(ECHO) -l z80 >> $(BIN_DIR)/$(TARGET).arf
-	$(QUIET)$(ECHO) $(BIN_DIR)/$(TARGET).rel >> $(BIN_DIR)/$(TARGET).arf
-	$(QUIET)$(ECHO) $(BIN_DIR)/console.rel >> $(BIN_DIR)/$(TARGET).arf
-	$(QUIET)$(ECHO) $(BIN_DIR)/xmodem.rel >> $(BIN_DIR)/$(TARGET).arf
-	$(QUIET)$(ECHO) $(BIN_DIR)/n8vem_conio.rel >> $(BIN_DIR)/$(TARGET).arf
-	$(QUIET)$(ECHO) $(BIN_DIR)/n8vem_serio.rel >> $(BIN_DIR)/$(TARGET).arf
-	$(QUIET)$(ECHO) -u >> $(BIN_DIR)/$(TARGET).arf
-	$(QUIET)$(ECHO) -e >> $(BIN_DIR)/$(TARGET).arf
+	$(CCC) $(CCC_FLAGS) -c -o $(BIN_DIR) $(SRC_DIR)/io/boards/n8vem_conio.c
 
 clean:
 	rm $(BIN_DIR)/*
