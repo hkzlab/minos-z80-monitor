@@ -16,6 +16,8 @@ COPY = cp
 MOVE = mv
 H2B = hex2bin
 
+ROMADDR = 0xF000
+
 # Tool flags
 # Pad the image to 2048 bytes
 H2B_FLAGS = -s F000 -l 800
@@ -34,8 +36,8 @@ DLOC = 0x8000
 
 # Compilation / Assembly / Linking flags
 CUST_DEFINES = -D__USE_N8VEM_CONSOLE__ -D__USE_N8VEM_SERIO__
-CCC_FLAGS = -mz80 -D__SDCC__=1 -D__CLOC__=$(CLOC) -D__DLOC__=$(DLOC) $(CUST_DEFINES) $(INCLUDES)
-CAS_FLAGS = -plosff 
+CCC_FLAGS = -mz80 -D__SDCC__=1 -D__ROMADDR__=$(ROM_ADDR) -D__CLOC__=$(CLOC) -D__DLOC__=$(DLOC) $(CUST_DEFINES) $(INCLUDES)
+CAS_FLAGS = -plosff
 CLD_FLAGS = --code-loc $(CLOC) --data-loc $(DLOC) --code-size $(CSIZ) --no-std-crt0 --out-fmt-ihx
 
 # Here begins the actual creation of destination files

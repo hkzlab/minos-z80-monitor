@@ -13,14 +13,13 @@
 #include <io/boards/n8vem_serio.h>
 #endif
 
-static const char title_str[] = "ITHACA AUDIO Z80 CPU BOARD\n"
-								" I > Inp. port | O > Out. port | M > Mem. Map  |";
+static const char title_str[] = "ITHACA AUDIO Z80 CPU BOARD\r\n";
 
 void monitor_outp(uint8_t port, uint8_t data);
 
 void sys_init(void) {
-	// Cleanup the ram segment used for the monitor
-	memset((uint8_t*)__DLOC__, 0x00, __CLOC__-__DLOC__);
+	// Clear Zero page
+	memset((uint8_t*)0x00, 0x00, 0xFF);
 
 #ifdef __USE_N8VEM_CONSOLE__
 	n8vem_conio_init();
