@@ -43,7 +43,7 @@ void monitor_outp(uint8_t port, uint8_t data);
 uint8_t monitor_inp(uint8_t port);
 void monitor_write(uint16_t *addr, uint8_t data);
 uint8_t monitor_read(uint16_t *addr);
-void monitor_jmp(uint16_t *addr);
+void monitor_jmp(uint8_t *addr);
 
 uint8_t monitor_parseU8(char *str);
 
@@ -107,13 +107,32 @@ void main(void) {
 /***/
 
 uint8_t monitor_parseU8(char *str) {
-	str;
-	return 0;
+	uint8_t val = 0;
+	uint8_t idx;
+	char ch;
+
+	for (idx = 0; idx < 2; idx++) {
+		ch = str[1 - idx];
+
+		if ((ch >= 0x61) && (ch <= 0x66))
+			ch -= 0x20;
+
+		if ((ch >= 0x41) && (ch <= 0x46))
+			val |= (ch - 55) << (4 * idx); // Convert from ASCII to value
+		else if ((ch >= 0x30) && (ch <= 0x39))
+			val |= (ch - 48) << (4 * idx); // Convert from ASCII to value
+	}
+
+	return val;
 }
 
 uint16_t monitor_parseU16(char *str) {
-	str;
-	return 0;
+	uint16_t val = 0;
+
+	val |= (monitor_parseU8(str+0) << 8);
+	val |= (monitor_parseU8(str+2) << 0);
+
+	return val;
 }
 
 void monitor_parse_command(char *cmd, uint8_t idx) {
@@ -126,12 +145,8 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 			console_printString(monitor_cmds);
 			break;
 /*
-		case 'O': // OUT
-		case 'o':
 		case 'I': // IN
 		case 'i':
-		case 'J': // JP
-		case 'j':
 		case 'W': // WRITE
 		case 'w':
 		case 'R': // READ
@@ -139,6 +154,15 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 		case 'X': // XModem transfer
 		case 'x':
 */
+		case 'J': // JP
+		case 'j':
+			monitor_jmp((uint8_t*)monitor_parseU16(&cmd[1]));
+			break;
+		
+		case 'O': // OUT
+		case 'o':
+			monitor_outp(monitor_parseU8(&cmd[1]), monitor_parseU8(&cmd[4]));
+			break;
 		default:
 			console_printString("\r\n");
 			console_printString(cmd_notimpl_msg);
@@ -161,9 +185,14 @@ uint8_t monitor_read(uint16_t *addr) {
 	return 0;
 }
 
-void monitor_jmp(uint16_t *addr) __naked {
-	addr;
+void monitor_jmp(uint8_t *addr) __naked {
+	__asm
+		pop bc
+		pop hl
+		jp (hl)
 
+		ret
+	__endasm;
 }
 
 void monitor_outp(uint8_t port, uint8_t data) __naked {
