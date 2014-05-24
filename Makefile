@@ -18,8 +18,8 @@ H2B = hex2bin
 
 # Tool flags
 # Pad the image to 2048 bytes
-#H2B_FLAGS = -s F000 -l 800
-H2B_FLAGS = -s F000 -l 400
+H2B_FLAGS = -s F000 -l 800
+#H2B_FLAGS = -s F000 -l 400
 
 # Project directories
 SRC_DIR = src/
@@ -42,6 +42,9 @@ CLD_FLAGS = --code-loc $(CLOC) --data-loc $(DLOC) --code-size $(CSIZ) --no-std-c
 TARGET = monitor
 
 #all: $(BIN_DIR)/$(TARGET).hex
+allpad: $(BIN_DIR)/$(TARGET).bin
+	cat $(BIN_DIR)/$(TARGET).bin $(BIN_DIR)/$(TARGET).bin $(BIN_DIR)/$(TARGET).bin $(BIN_DIR)/$(TARGET).bin > $(BIN_DIR)/$(TARGET)_pad.bin
+
 all: $(BIN_DIR)/$(TARGET).bin
 
 $(BIN_DIR)/$(TARGET).bin:	$(BIN_DIR)/$(TARGET).hex

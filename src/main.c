@@ -38,7 +38,7 @@ void main(void) {
 	console_printString(title_str);
 
 	while(1) {
-		;	
+		console_printString(title_str);
 	}
 }
 
