@@ -13,7 +13,13 @@
 #include <io/boards/n8vem_serio.h>
 #endif
 
-static const char title_str[] = "ITHACA AUDIO Z80 CPU BOARD\r\n";
+#define MONITOR_TITLE "ITHACA AUDIO Z80 "
+#define MONITOR_VERSION "v0.01"
+#define MONITOR_COPYRIGHT " (Fabio Battaglia)"
+
+static const char title_str[] = MONITOR_TITLE MONITOR_VERSION MONITOR_COPYRIGHT " \a\a\r\n";
+static const char monitor_cmds[] = "O - OUT to port | I - IN from port | J - JP to addr\r\n"
+								   "X - XModem      \r\n";
 
 void monitor_outp(uint8_t port, uint8_t data);
 
@@ -35,16 +41,17 @@ void main(void) {
 	sys_init();
 
 	console_printString(title_str);
+	console_printString(monitor_cmds);
 
 	while(1) {
-		console_printString(title_str);
+		;
 	}
 }
 
 /*** Monitor Commands ***/
 
-void monitor_outp(uint8_t port, uint8_t data) {
-	port; data; // Silence the warning...
+void monitor_outp(uint8_t port, uint8_t data) __naked {
+	port; data;
 
 	__asm
 		ld hl, #3
@@ -60,11 +67,25 @@ void monitor_outp(uint8_t port, uint8_t data) {
 		out (c), a // Output to port
 
 		pop bc
+
+		ret
 	__endasm;
 }
 
-uint8_t monitor_inp(uint8_t port) {
+uint8_t monitor_inp(uint8_t port) __naked {
 	port;
 
-	return 0;
+	__asm
+		ld hl, #2
+		add hl, sp
+
+		push bc
+
+		ld c, (hl)
+		in l,(c)
+
+		pop bc
+
+		ret
+	__endasm;
 }
