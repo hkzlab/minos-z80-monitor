@@ -21,7 +21,7 @@
 
 static const char title_str[] = MONITOR_TITLE MONITOR_VERSION MONITOR_COPYRIGHT " \a\a\r\n";
 static const char monitor_cmds[] = " O - OUT port   | I - IN port    | J - JP to addr \r\n"
-								   " W - Write mem  | R - Read mem   | X - XModem trns\r\n\n"
+								   " W - Write mem  | R - Read mem   | X - XModem trns\r\n"
 								   " H - Help \r\n\n";
 
 static const char cmd_prompt[] = "] ";
@@ -95,7 +95,7 @@ void main(void) {
 						console_printString(cmd_err_msg);
 
 					} else {
-						cmd_buffer[buf_idx++];
+						cmd_buffer[buf_idx++] = ch;
 					}
 					break;
 			}
