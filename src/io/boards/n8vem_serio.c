@@ -20,6 +20,7 @@ static uint8_t ser_initdata[SER_INITDATA_SIZE] = { 0x04, 0x44, // WR4: X16 clock
 												   0x0B, 0x56, // WR11: Recieve/transmit clock = BRG
 												   //0x0C, 0x06, // WR12: BRate Low byte 19,200 Baud
 												   0x0C, 0x0E, // WR12: BRate Low byte 9,600 Baud
+												   //0x0C, 0x40, // WR12: BRate Low byte 2,400 Baud
 												   0x0D, 0x00, // WR13: High byte
 												   0x0E, 0x01, // WR14: Use 4.9152 MHz Clock.
 												   0x0F, 0x00}; // WR15: Generate Int with CTS going high
