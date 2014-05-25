@@ -143,7 +143,7 @@ void monitor_printU8(uint8_t data, char *str) {
 	uint8_t idx, val;
 
 	for (idx = 0; idx < 2; idx++) {
-		val = (data >> (4 * (1 - idx)) & 0xFF);
+		val = (data >> (4 * (1 - idx)) & 0x0F);
 		if (val <= 9)
 			str[idx] = val + 0x30;
 		else
@@ -176,6 +176,7 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 			memcpy(buff, &cmd[1], 2);
 			monitor_printU8(val, &buff[4]);
 
+			console_printString("\r\n");
 			console_printString(buff);
 			console_printString("\r\n");
 			break;
@@ -186,6 +187,7 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 			memcpy(buff, &cmd[1], 4);
 			monitor_printU8(val, &buff[6]);
 
+			console_printString("\r\n");
 			console_printString(buff);
 			console_printString("\r\n");
 			break;
