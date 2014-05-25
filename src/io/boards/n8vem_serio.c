@@ -34,3 +34,10 @@ void n8vem_serio_init(void) {
 	SerIO_PAR_CTL = 0x8A; // A input, B output, C(bits 0-3) output, (bits 4-7)input
 }
 
+char n8vem_serio_getch(void) {
+	return 0;
+}
+
+void n8vem_serio_putch(char ch) {
+	;
+}
