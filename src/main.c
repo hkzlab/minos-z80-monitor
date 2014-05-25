@@ -16,17 +16,16 @@
 #define CMD_BUF_SIZE 12
 
 #define MONITOR_TITLE "SZ80M "
-#define MONITOR_VERSION "v0.01"
+#define MONITOR_VERSION "v0.05"
 #define MONITOR_COPYRIGHT " (hkzlabnet@gmail.com)"
 
 static const char title_str[] = MONITOR_TITLE MONITOR_VERSION MONITOR_COPYRIGHT " \a\a\r\n";
-static const char monitor_cmds[] = " O - OUT port   I - IN port    J - JP to addr \r\n"
-								   " W - Write mem  R - Read mem   X - XModem trns\r\n"
+static const char monitor_cmds[] = " O - OUT port  I - IN port   J - JP to addr \r\n"
+								   " W - WR mem    R - RD mem    X - XModem     \r\n"
 								   " H - Help \r\n\n";
 
 static const char cmd_prompt[] = "] ";
 
-static const char cmd_notimpl_msg[] = "CMD NOT IMPL\r\n";
 static const char cmd_err_msg[] = "CMD ERR\r\n";
 
 
@@ -202,7 +201,7 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 			break;
 		default:
 			console_printString("\r\n");
-			console_printString(cmd_notimpl_msg);
+			console_printString(cmd_err_msg);
 			break;
 	}
 
