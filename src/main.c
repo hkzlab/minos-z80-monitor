@@ -38,6 +38,7 @@ void monitor_parse_command(char *cmd, uint8_t idx);
 
 uint8_t monitor_parseU8(char *str);
 uint16_t monitor_parseU16(char *str);
+void monitor_printU8(uint8_t data, char *str);
 /**/
 void monitor_outp(uint8_t port, uint8_t data);
 uint8_t monitor_inp(uint8_t port);
@@ -45,7 +46,6 @@ void monitor_write(uint8_t *addr, uint8_t data);
 uint8_t monitor_read(uint8_t *addr);
 void monitor_jmp(uint8_t *addr);
 
-uint8_t monitor_parseU8(char *str);
 
 /** Here lies the code **/
 void sys_init(void) {
@@ -113,8 +113,7 @@ void main(void) {
 /***/
 
 uint8_t monitor_parseU8(char *str) {
-	uint8_t val = 0;
-	uint8_t idx;
+	uint8_t val = 0, idx;
 	char ch;
 
 	for (idx = 0; idx < 2; idx++) {
@@ -141,8 +140,27 @@ uint16_t monitor_parseU16(char *str) {
 	return val;
 }
 
+void monitor_printU8(uint8_t data, char *str) {
+	uint8_t idx, val;
+
+	for (idx = 0; idx < 2; idx++) {
+		val = (data >> (4 * (1 - idx)) & 0xFF);
+		if (val <= 9)
+			str[idx] = val + 0x30;
+		else
+			str[idx] = val + 0x37;
+	}
+}
+
+#define STR_BUFF_LEN 11
 void monitor_parse_command(char *cmd, uint8_t idx) {
+	char buff[STR_BUFF_LEN];
+	uint8_t val;
+
 	if (!idx) return;
+
+	memset(buff, ' ', sizeof(buff));
+	buff[sizeof(buff)-1] = 0;
 
 	switch(cmd[0]) {
 		case 'H': // Help
@@ -150,10 +168,28 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 			console_printString(monitor_cmds);
 			break;
 /*
-		case 'I': // IN
-		case 'R': // READ
 		case 'X': // XModem transfer
 */
+		case 'I': // IN
+			val = monitor_inp(monitor_parseU8(&cmd[1]));
+			
+			// Copy the address
+			memcpy(buff, &cmd[1], 2);
+			monitor_printU8(val, &buff[4]);
+
+			console_printString(buff);
+			console_printString("\r\n");
+			break;
+		case 'R': // READ
+			val = monitor_read((uint8_t*)monitor_parseU16(&cmd[1]));
+
+			// Copy the address
+			memcpy(buff, &cmd[1], 4);
+			monitor_printU8(val, &buff[6]);
+
+			console_printString(buff);
+			console_printString("\r\n");
+			break;
 		case 'W': // WRITE
 			monitor_write((uint8_t*)monitor_parseU16(&cmd[1]), monitor_parseU8(&cmd[6]));
 			break;
