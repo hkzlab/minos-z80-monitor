@@ -11,22 +11,21 @@
 
 #ifdef __USE_N8VEM_SERIO__
 #include <io/boards/n8vem_serio.h>
+#include <io/xmodem.h>
 #endif
 
 #define CMD_BUF_SIZE 12
 
 #define MONITOR_TITLE "SZ80M "
-#define MONITOR_VERSION "v0.05"
-#define MONITOR_COPYRIGHT " (hkzlabnet@gmail.com)"
+#define MONITOR_VERSION "0.05"
 
-static const char title_str[] = MONITOR_TITLE MONITOR_VERSION MONITOR_COPYRIGHT " \a\a\r\n";
-static const char monitor_cmds[] = " O - OUT port  I - IN port   J - JP to addr \r\n"
-								   " W - WR mem    R - RD mem    X - XModem     \r\n"
-								   " H - Help \r\n\n";
+static const char title_str[] = MONITOR_TITLE MONITOR_VERSION " \a\r\n";
+
+static const char monitor_cmds[] = " O-OUT I-IN J-JP W-WRM R-RDM X-XFR H-HLP\r\n";
 
 static const char cmd_prompt[] = "] ";
 
-static const char cmd_err_msg[] = "CMD ERR\r\n";
+static const char cmd_err_msg[] = "ERR\r\n";
 
 
 static char cmd_buffer[CMD_BUF_SIZE];
@@ -41,18 +40,16 @@ void monitor_printU8(uint8_t data, char *str);
 /**/
 void monitor_outp(uint8_t port, uint8_t data);
 uint8_t monitor_inp(uint8_t port);
-void monitor_write(uint8_t *addr, uint8_t data);
-uint8_t monitor_read(uint8_t *addr);
 void monitor_jmp(uint8_t *addr);
 
 
 /** Here lies the code **/
 void sys_init(void) {
 	// Clear Zero page
-	memset((uint8_t*)0x00, 0x00, 0xFF);
+	//memset((uint8_t*)0x00, 0x00, 0xFF);
 
 #ifdef __USE_N8VEM_CONSOLE__
-	n8vem_conio_init();
+//	n8vem_conio_init();
 #endif
 
 #ifdef __USE_N8VEM_SERIO__
@@ -166,9 +163,13 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 			console_printString("\r\n");
 			console_printString(monitor_cmds);
 			break;
-/*
+#ifdef __USE_N8VEM_SERIO__
 		case 'X': // XModem transfer
-*/
+			if(xmodem_receive((uint8_t*)monitor_parseU16(&cmd[1]), 0xFFFF)) {
+				console_printString("\r\nXFER fail");
+			}
+			break;
+#endif
 		case 'I': // IN
 			val = monitor_inp(monitor_parseU8(&cmd[1]));
 			
@@ -180,7 +181,7 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 			console_printString(buff);
 			break;
 		case 'R': // READ
-			val = monitor_read((uint8_t*)monitor_parseU16(&cmd[1]));
+			val = *((uint8_t*)monitor_parseU16(&cmd[1]));
 
 			// Copy the address
 			memcpy(buff, &cmd[1], 4);
@@ -190,7 +191,7 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 			console_printString(buff);
 			break;
 		case 'W': // WRITE
-			monitor_write((uint8_t*)monitor_parseU16(&cmd[1]), monitor_parseU8(&cmd[6]));
+			*((uint8_t*)monitor_parseU16(&cmd[1])) = monitor_parseU8(&cmd[6]);
 			break;
 		case 'J': // JP
 			monitor_jmp((uint8_t*)monitor_parseU16(&cmd[1]));
@@ -209,14 +210,6 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 }
 
 /*** Monitor Commands ***/
-void monitor_write(uint8_t *addr, uint8_t data) {
-	*addr = data;
-}
-
-uint8_t monitor_read(uint8_t *addr) {
-	return *addr;
-}
-
 void monitor_jmp(uint8_t *addr) __naked {
 	addr;
 

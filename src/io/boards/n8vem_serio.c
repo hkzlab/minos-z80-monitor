@@ -25,19 +25,62 @@ static uint8_t ser_initdata[SER_INITDATA_SIZE] = { 0x04, 0x44, // WR4: X16 clock
 
 void n8vem_serio_init(void) {
 	uint8_t idx;
+/*
 	for (idx = 0; idx < SER_INITDATA_SIZE; idx++)
 		SerIO_CTLB = ser_initdata[idx];
-	
+*/	
 	for (idx = 0; idx < SER_INITDATA_SIZE; idx++)
 		SerIO_CTLA = ser_initdata[idx];
 
 	SerIO_PAR_CTL = 0x8A; // A input, B output, C(bits 0-3) output, (bits 4-7)input
 }
 
-char n8vem_serio_getch(void) {
-	return 0;
+#if 1
+char n8vem_serio_getch_nb(uint8_t *stat) {
+	SerIO_CTLA = 0;
+	*stat = SerIO_CTLA & 0x01;
+	return SerIO_DATA;
+}
+
+
+void n8vem_serio_putch(char ch) {
+	while (1) {
+		SerIO_CTLA = 0;
+
+		if (SerIO_CTLA & 0x04) break;
+	}
+
+	SerIO_DATA = ch;
+}
+#else
+
+char n8vem_serio_getch_nb(uint8_t *stat) {
+	SerIO_CTLB = 0;
+	*stat = SerIO_CTLB & 0x01;
+	return SerIO_DATB;
 }
 
 void n8vem_serio_putch(char ch) {
-	;
+	while (1) {
+		SerIO_CTLB = 0;
+
+		if (SerIO_CTLB & 0x04) break;
+	}
+
+	SerIO_DATB = ch;
 }
+
+
+#endif
+
+char n8vem_serio_getch() {
+	volatile uint8_t stat = 0;
+	char ch = 0;
+
+	while(!stat) {
+		ch = n8vem_serio_getch_nb(&stat);
+	}
+
+	return ch;
+}
+

@@ -29,7 +29,7 @@ BIN_DIR = bin/
 
 INCLUDES = -I$(SRC_DIR)/include -I$(SRC_DIR)
 
-CLOC = 0xF070
+CLOC = 0xF050
 CSIZ = 0x390
 #CSIZ = 0x790
 DLOC = 0x8000
