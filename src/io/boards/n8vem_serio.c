@@ -38,6 +38,12 @@ void n8vem_serio_init(void) {
 }
 
 #if 1
+char n8vem_serio_getch(void) {
+	SerIO_CTLA = 0;
+	while(!(SerIO_CTLA & 0x01));
+	return SerIO_DATA;
+}
+
 char n8vem_serio_getch_nb(uint8_t *stat) {
 	SerIO_CTLA = 0;
 	*stat = SerIO_CTLA & 0x01;
@@ -55,6 +61,11 @@ void n8vem_serio_putch(char ch) {
 	SerIO_DATA = ch;
 }
 #else
+char n8vem_serio_getch(void) {
+	SerIO_CTLB = 0;
+	while(!(SerIO_CTLB & 0x01));
+	return SerIO_DATB;
+}
 
 char n8vem_serio_getch_nb(uint8_t *stat) {
 	SerIO_CTLB = 0;
@@ -74,15 +85,4 @@ void n8vem_serio_putch(char ch) {
 
 
 #endif
-
-char n8vem_serio_getch() {
-	volatile uint8_t stat = 0;
-	char ch = 0;
-
-	while(!stat) {
-		ch = n8vem_serio_getch_nb(&stat);
-	}
-
-	return ch;
-}
 
