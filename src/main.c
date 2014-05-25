@@ -15,19 +15,19 @@
 
 #define CMD_BUF_SIZE 12
 
-#define MONITOR_TITLE "ITHACA AUDIO Z80 "
+#define MONITOR_TITLE "SZ80M "
 #define MONITOR_VERSION "v0.01"
-#define MONITOR_COPYRIGHT " (Fabio Battaglia)"
+#define MONITOR_COPYRIGHT " (hkzlabnet@gmail.com)"
 
 static const char title_str[] = MONITOR_TITLE MONITOR_VERSION MONITOR_COPYRIGHT " \a\a\r\n";
-static const char monitor_cmds[] = " O - OUT port   | I - IN port    | J - JP to addr \r\n"
-								   " W - Write mem  | R - Read mem   | X - XModem trns\r\n"
+static const char monitor_cmds[] = " O - OUT port   I - IN port    J - JP to addr \r\n"
+								   " W - Write mem  R - Read mem   X - XModem trns\r\n"
 								   " H - Help \r\n\n";
 
 static const char cmd_prompt[] = "] ";
 
-static const char cmd_notimpl_msg[] = "CMD NOT IMPLEMENTED!\r\n";
-static const char cmd_err_msg[] = "CMD ERROR!\r\n";
+static const char cmd_notimpl_msg[] = "CMD NOT IMPL\r\n";
+static const char cmd_err_msg[] = "CMD ERR\r\n";
 
 
 static char cmd_buffer[CMD_BUF_SIZE];
@@ -41,8 +41,8 @@ uint16_t monitor_parseU16(char *str);
 /**/
 void monitor_outp(uint8_t port, uint8_t data);
 uint8_t monitor_inp(uint8_t port);
-void monitor_write(uint16_t *addr, uint8_t data);
-uint8_t monitor_read(uint16_t *addr);
+void monitor_write(uint8_t *addr, uint8_t data);
+uint8_t monitor_read(uint8_t *addr);
 void monitor_jmp(uint8_t *addr);
 
 uint8_t monitor_parseU8(char *str);
@@ -80,6 +80,12 @@ void main(void) {
 		buf_idx = 0;
 		while(cmd_read_loop) {
 			ch = getchar(); // Read a char
+
+			// Turn the letter uppercase!
+			if (ch >= 0x61 && ch <= 0x7A) {
+				ch -= 0x20;
+			}
+
 			putchar(ch); // Print it
 
 			switch(ch) {
@@ -114,8 +120,8 @@ uint8_t monitor_parseU8(char *str) {
 	for (idx = 0; idx < 2; idx++) {
 		ch = str[1 - idx];
 
-		if ((ch >= 0x61) && (ch <= 0x66))
-			ch -= 0x20;
+//		if ((ch >= 0x61) && (ch <= 0x66))
+//			ch -= 0x20;
 
 		if ((ch >= 0x41) && (ch <= 0x46))
 			val |= (ch - 55) << (4 * idx); // Convert from ASCII to value
@@ -140,27 +146,22 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 
 	switch(cmd[0]) {
 		case 'H': // Help
-		case 'h':
 			console_printString("\r\n");
 			console_printString(monitor_cmds);
 			break;
 /*
 		case 'I': // IN
-		case 'i':
-		case 'W': // WRITE
-		case 'w':
 		case 'R': // READ
-		case 'r':
 		case 'X': // XModem transfer
-		case 'x':
 */
+		case 'W': // WRITE
+			monitor_write((uint8_t*)monitor_parseU16(&cmd[1]), monitor_parseU8(&cmd[6]));
+			break;
 		case 'J': // JP
-		case 'j':
 			monitor_jmp((uint8_t*)monitor_parseU16(&cmd[1]));
 			break;
 		
 		case 'O': // OUT
-		case 'o':
 			monitor_outp(monitor_parseU8(&cmd[1]), monitor_parseU8(&cmd[4]));
 			break;
 		default:
@@ -173,19 +174,17 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 }
 
 /*** Monitor Commands ***/
-void monitor_write(uint16_t *addr, uint8_t data) {
-	addr; data;
-
-	return;
+void monitor_write(uint8_t *addr, uint8_t data) {
+	*addr = data;
 }
 
-uint8_t monitor_read(uint16_t *addr) {
-	addr;
-
-	return 0;
+uint8_t monitor_read(uint8_t *addr) {
+	return *addr;
 }
 
 void monitor_jmp(uint8_t *addr) __naked {
+	addr;
+
 	__asm
 		pop bc
 		pop hl
