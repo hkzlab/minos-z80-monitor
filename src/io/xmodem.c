@@ -22,6 +22,7 @@ static uint8_t wait_getData(uint8_t *data);
 static uint8_t xmodem_mngPkt(uint8_t *dest);
 
 static uint8_t expected_pkt;
+static uint8_t pkt_buf[131];
 
 uint8_t xmodem_receive(uint8_t* dest) {
 	uint8_t retries = MAXERR;
@@ -106,37 +107,24 @@ static uint8_t wait_getData(uint8_t *data) {
 }
 
 static uint8_t xmodem_mngPkt(uint8_t *dest) {
-	uint8_t pktID, npktID, chk, idx;
+	uint8_t idx;
 
 	console_printString("\r\nMNG\r\n");
-	if (!wait_getData(&pktID)) { // Trying to get pktID
-		return 0;
-	}
-
-	if (!wait_getData(&npktID)) { // Trying to get npktID
-		return 0;
-	}
-
-	if(npktID != (0xFF - pktID)) { // Verify we got the packet number correctly
-		return 0;
-	}
-	
-	if (pktID == (expected_pkt - 1)) // Already got this...
-		return 2;
-	else if (pktID == expected_pkt) {
-		for(idx = 0; idx < 128; idx++) {
-			console_printString("\r\nRD\r\n");
-			if (!wait_getData(&dest[idx])) {
+	for (idx = 0; idx < 131; idx++) {
+		if (!wait_getData(&pkt_buf[idx])) {
 				console_printString("\r\nFREAD\r\n");
 				return 0;
-			}
 		}
-	
-		if (!wait_getData(&chk)) { // Trying to get checksum 
-			return 0;
-		}
+	}
 
-		if(checksum(dest) == chk) { // OK!
+	if(pkt_buf[1] != (0xFF - pkt_buf[0])) { // Verify we got the packet number correctly
+		return 0;
+	}
+	
+	if (pkt_buf[0] == (expected_pkt - 1)) // Already got this...
+		return 2;
+	else if (pkt_buf[1] == expected_pkt) {
+		if(checksum(&pkt_buf[2]) == pkt_buf[130]) { // OK!
 			return 1;
 		}
 	}
