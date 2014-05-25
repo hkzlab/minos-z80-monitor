@@ -37,19 +37,36 @@ void n8vem_serio_init(void) {
 	SerIO_PAR_CTL = 0x8A; // A input, B output, C(bits 0-3) output, (bits 4-7)input
 }
 
-#if 1
 char n8vem_serio_getch(void) {
 	SerIO_CTLA = 0;
 	while(!(SerIO_CTLA & 0x01));
 	return SerIO_DATA;
 }
 
-char n8vem_serio_getch_nb(uint8_t *stat) {
-	SerIO_CTLA = 0;
-	*stat = SerIO_CTLA & 0x01;
-	return SerIO_DATA;
-}
+char n8vem_serio_getch_nb(uint8_t *stat, uint8_t secs) {
+	uint16_t cnt;
+	
+	SerIO_CTLA = 0x05; // Sel Reg 5
+	SerIO_CTLA = 0xEA; // Lower RTS
 
+	__asm
+		nop
+		nop
+	__endasm;
+
+	while(secs--) { 
+		cnt = 0xBBBB;
+		while(cnt--) {
+			if (SerIO_CTLA & 0x01) {
+				*stat = 1;
+				return SerIO_DATA;
+			}
+		}
+	}
+
+	*stat = 0;
+	return 0;
+}
 
 void n8vem_serio_putch(char ch) {
 	while (1) {
@@ -59,30 +76,13 @@ void n8vem_serio_putch(char ch) {
 	}
 
 	SerIO_DATA = ch;
+	
+	SerIO_CTLA = 0x05; // Sel Reg 5
+	SerIO_CTLA = 0xE8; // Raise RTS
+
+	__asm
+		nop
+		nop
+	__endasm;
 }
-#else
-char n8vem_serio_getch(void) {
-	SerIO_CTLB = 0;
-	while(!(SerIO_CTLB & 0x01));
-	return SerIO_DATB;
-}
-
-char n8vem_serio_getch_nb(uint8_t *stat) {
-	SerIO_CTLB = 0;
-	*stat = SerIO_CTLB & 0x01;
-	return SerIO_DATB;
-}
-
-void n8vem_serio_putch(char ch) {
-	while (1) {
-		SerIO_CTLB = 0;
-
-		if (SerIO_CTLB & 0x04) break;
-	}
-
-	SerIO_DATB = ch;
-}
-
-
-#endif
 

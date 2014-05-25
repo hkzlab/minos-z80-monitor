@@ -18,7 +18,7 @@
 
 static void flush(void);
 static uint8_t checksum(uint8_t *buf);
-static uint8_t wait_getData(uint8_t *data);
+static uint8_t wait_getData(uint8_t *data, uint8_t secs);
 static uint8_t xmodem_mngPkt(uint8_t *dest);
 
 static uint8_t expected_pkt;
@@ -33,7 +33,7 @@ uint8_t xmodem_receive(uint8_t* dest) {
 
 	n8vem_serio_putch(NAK);
 	while(retries--) {
-		if(wait_getData(&ch)) {
+		if(wait_getData(&ch, 10)) {
 			switch(ch) {
 				case SOH:
 					res = xmodem_mngPkt(dest);
@@ -78,7 +78,7 @@ static void flush(void) {
 				nop
 			__endasm;
 		}
-		n8vem_serio_getch_nb(&val);
+		n8vem_serio_getch_nb(&val, 1);
 	}
 }
 
@@ -91,19 +91,11 @@ static uint8_t checksum(uint8_t *buf) {
 	return val;
 }
 
-static uint8_t wait_getData(uint8_t *data) {
-	uint16_t retries = 0xFFFF;
-	uint8_t stat = 0;	
+static uint8_t wait_getData(uint8_t *data, uint8_t secs) {
+	uint8_t stat;
+	*data = n8vem_serio_getch_nb(&stat, secs);
 
-	while (retries-- && !stat) {
-		*data = n8vem_serio_getch_nb(&stat);		
-	}
-
-	// Read nothing...
-	if (!stat)
-		return 0;
-	else
-		return 1;
+	return stat;
 }
 
 static uint8_t xmodem_mngPkt(uint8_t *dest) {
@@ -111,7 +103,7 @@ static uint8_t xmodem_mngPkt(uint8_t *dest) {
 
 	console_printString("\r\nMNG\r\n");
 	for (idx = 0; idx < 131; idx++) {
-		if (!wait_getData(&pkt_buf[idx])) {
+		if (!wait_getData(&pkt_buf[idx], 10)) {
 				console_printString("\r\nFREAD\r\n");
 				return 0;
 		}
