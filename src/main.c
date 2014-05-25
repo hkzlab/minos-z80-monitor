@@ -178,7 +178,6 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 
 			console_printString("\r\n");
 			console_printString(buff);
-			console_printString("\r\n");
 			break;
 		case 'R': // READ
 			val = monitor_read((uint8_t*)monitor_parseU16(&cmd[1]));
@@ -189,7 +188,6 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 
 			console_printString("\r\n");
 			console_printString(buff);
-			console_printString("\r\n");
 			break;
 		case 'W': // WRITE
 			monitor_write((uint8_t*)monitor_parseU16(&cmd[1]), monitor_parseU8(&cmd[6]));
