@@ -3,6 +3,6 @@
 
 #include <common_datatypes.h>
 
-uint8_t xmodem_receive(uint8_t* dest, uint16_t maxSize);
+uint8_t xmodem_receive(uint8_t* dest);
 
 #endif /* _XMODEM_HEADER_ */

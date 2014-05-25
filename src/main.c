@@ -21,7 +21,7 @@
 
 static const char title_str[] = MONITOR_TITLE MONITOR_VERSION " \a\r\n";
 
-static const char monitor_cmds[] = " O-OUT I-IN J-JP W-WRM R-RDM X-XFR H-HLP\r\n";
+static const char monitor_cmds[] = " O/I/J/W/R/X/H\r\n";
 
 static const char cmd_prompt[] = "] ";
 
@@ -165,9 +165,9 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 			break;
 #ifdef __USE_N8VEM_SERIO__
 		case 'X': // XModem transfer
-			if(xmodem_receive((uint8_t*)monitor_parseU16(&cmd[1]), 0xFFFF)) {
-				console_printString("\r\nXFER fail");
-			}
+			monitor_printU8(xmodem_receive((uint8_t*)monitor_parseU16(&cmd[1])), &buff[0]);
+			console_printString("\r\n");
+			console_printString(buff);
 			break;
 #endif
 		case 'I': // IN
