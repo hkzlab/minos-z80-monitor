@@ -18,14 +18,14 @@
 
 #define CMD_BUF_SIZE 12
 
-#define MONITOR_TITLE "MINOS "
-#define MONITOR_VERSION "0.05"
+#define MONITOR_TITLE " MINOS "
+#define MONITOR_VERSION "1.0"
 
 static const char title_str[] = MONITOR_TITLE MONITOR_VERSION"\a\r\n";
 
-static const char monitor_cmds[] =	" O - OUT port  I - IN port  J - JP addr\r\n"
-									" W - WR mem    R - RD mem   X - XModem\r\n"
-									" H - Help\r\n";
+static const char monitor_cmds[] =	"  O - OUT port  I - IN port  J - JP addr\r\n"
+									"  W - WR mem    R - RD mem   X - XModem\r\n"
+									"  H - Help\r\n";
 
 static const char cmd_prompt[] = "] ";
 
