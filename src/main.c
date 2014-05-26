@@ -5,6 +5,8 @@
 #include <common_datatypes.h>
 #include <io/console.h>
 
+#include "utilities.h"
+
 #ifdef __USE_N8VEM_CONSOLE__
 #include <io/boards/n8vem_conio.h>
 #endif
@@ -16,12 +18,14 @@
 
 #define CMD_BUF_SIZE 12
 
-#define MONITOR_TITLE "SZ80M "
+#define MONITOR_TITLE "MINOS "
 #define MONITOR_VERSION "0.05"
 
-static const char title_str[] = MONITOR_TITLE MONITOR_VERSION " \a\r\n";
+static const char title_str[] = MONITOR_TITLE MONITOR_VERSION"\a\r\n";
 
-static const char monitor_cmds[] = " O/I/J/W/R/X/H\r\n";
+static const char monitor_cmds[] =	" O - OUT port  I - IN port  J - JP addr\r\n"
+									" W - WR mem    R - RD mem   X - XModem\r\n"
+									" H - Help\r\n";
 
 static const char cmd_prompt[] = "] ";
 
@@ -34,9 +38,6 @@ static char cmd_buffer[CMD_BUF_SIZE];
 
 void monitor_parse_command(char *cmd, uint8_t idx);
 
-uint8_t monitor_parseU8(char *str);
-uint16_t monitor_parseU16(char *str);
-void monitor_printU8(uint8_t data, char *str);
 /**/
 void monitor_outp(uint8_t port, uint8_t data);
 uint8_t monitor_inp(uint8_t port);
@@ -108,45 +109,6 @@ void main(void) {
 
 /***/
 
-uint8_t monitor_parseU8(char *str) {
-	uint8_t val = 0, idx;
-	char ch;
-
-	for (idx = 0; idx < 2; idx++) {
-		ch = str[1 - idx];
-
-//		if ((ch >= 0x61) && (ch <= 0x66))
-//			ch -= 0x20;
-
-		if ((ch >= 0x41) && (ch <= 0x46))
-			val |= (ch - 55) << (4 * idx); // Convert from ASCII to value
-		else if ((ch >= 0x30) && (ch <= 0x39))
-			val |= (ch - 48) << (4 * idx); // Convert from ASCII to value
-	}
-
-	return val;
-}
-
-uint16_t monitor_parseU16(char *str) {
-	uint16_t val = 0;
-
-	val |= (monitor_parseU8(str+0) << 8);
-	val |= (monitor_parseU8(str+2) << 0);
-
-	return val;
-}
-
-void monitor_printU8(uint8_t data, char *str) {
-	uint8_t idx, val;
-
-	for (idx = 0; idx < 2; idx++) {
-		val = (data >> (4 * (1 - idx)) & 0x0F);
-		if (val <= 9)
-			str[idx] = val + 0x30;
-		else
-			str[idx] = val + 0x37;
-	}
-}
 
 #define STR_BUFF_LEN 11
 void monitor_parse_command(char *cmd, uint8_t idx) {
@@ -165,9 +127,7 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 			break;
 #ifdef __USE_N8VEM_SERIO__
 		case 'X': // XModem transfer
-			monitor_printU8(xmodem_receive((uint8_t*)monitor_parseU16(&cmd[1])), &buff[0]);
-			console_printString("\r\n");
-			console_printString(buff);
+			xmodem_receive((uint8_t*)monitor_parseU16(&cmd[1]));
 			break;
 #endif
 		case 'I': // IN

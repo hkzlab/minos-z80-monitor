@@ -19,20 +19,22 @@ static uint8_t ser_initdata[SER_INITDATA_SIZE] = { 0x04, 0x44, // WR4: X16 clock
 												   0x05, 0xEA, // WR5: Enable, Transmit 8 bits
 												   0x0B, 0x56, // WR11: Recieve/transmit clock = BRG
 												   //0x0C, 0x06, // WR12: BRate Low byte 19,200 Baud
-												   0x0C, 0x0E, // WR12: BRate Low byte 9,600 Baud
-												   //0x0C, 0x40, // WR12: BRate Low byte 2,400 Baud
+												   //0x0C, 0x0E, // WR12: BRate Low byte 9,600 Baud
+												   0x0C, 0x40, // WR12: BRate Low byte 2,400 Baud
 												   0x0D, 0x00, // WR13: High byte
 												   0x0E, 0x01, // WR14: Use 4.9152 MHz Clock.
 												   0x0F, 0x00}; // WR15: Generate Int with CTS going high
 
 void n8vem_serio_init(void) {
 	uint8_t idx;
-/*
-	for (idx = 0; idx < SER_INITDATA_SIZE; idx++)
-		SerIO_CTLB = ser_initdata[idx];
-*/	
-	for (idx = 0; idx < SER_INITDATA_SIZE; idx++)
+	
+	for (idx = 0; idx < SER_INITDATA_SIZE; idx++) {
 		SerIO_CTLA = ser_initdata[idx];
+	}
+	
+	for (idx = 0; idx < SER_INITDATA_SIZE; idx++) {
+		SerIO_CTLB = ser_initdata[idx];
+	}
 
 	SerIO_PAR_CTL = 0x8A; // A input, B output, C(bits 0-3) output, (bits 4-7)input
 }
@@ -64,7 +66,8 @@ char n8vem_serio_getch_nb(uint8_t *stat, uint8_t secs) {
 	__endasm;
 
 	while(secs--) { 
-		cnt = 0xBBBB;
+		//cnt = 0xBBBB;
+		cnt = 0x258B;
 		while(cnt--) {
 			if (SerIO_CTLA & 0x01) {
 				*stat = 1;
@@ -86,11 +89,6 @@ void n8vem_serio_putch(char ch) {
 	
 	SerIO_CTLA = 0x05; // Sel Reg 5
 	SerIO_CTLA = 0xE8; // Raise RTS
-
-	__asm
-		nop
-		nop
-	__endasm;
 }
 #else
 char n8vem_serio_getch(void) {

@@ -5,6 +5,7 @@
 
 #include "boards/n8vem_serio.h"
 #include "console.h"
+#include "utilities.h"
 
 #define SOH  0x01
 #define EOT  0x04
@@ -24,13 +25,19 @@ static uint8_t xmodem_mngPkt(uint8_t *dest);
 static uint8_t expected_pkt;
 static uint8_t pkt_buf[131];
 
+static char str_buf[3];
+
 uint8_t xmodem_receive(uint8_t* dest) {
 	uint8_t retries = MAXERR;
 	uint8_t ch = 0;
 	uint8_t res;
 
-	expected_pkt = 0x01; // Setting to the first packet
 
+	expected_pkt = 0x01; // Setting to the first packet
+	str_buf[2] = 0;
+	
+	console_printString("\r\n");
+	
 	n8vem_serio_putch(NAK);
 	while(retries--) {
 		if(wait_getData(&ch, 10)) {
@@ -38,6 +45,11 @@ uint8_t xmodem_receive(uint8_t* dest) {
 				case SOH:
 					res = xmodem_mngPkt(dest);
 					if (res == 1) { // New block
+						console_printString("ACK ");
+						monitor_printU8(expected_pkt, str_buf);
+						console_printString(str_buf);
+						console_printString("\r\n");
+
 						dest+=128; // Next block
 						expected_pkt++;
 						n8vem_serio_putch(ACK);
@@ -46,15 +58,19 @@ uint8_t xmodem_receive(uint8_t* dest) {
 						flush();
 						n8vem_serio_putch(ACK);
 						retries = MAXERR;
+						console_printString("RACK\r\n");
 					} else { // Garbage
 						flush();
 						n8vem_serio_putch(NAK);
+						console_printString("NAK\r\n");
 					}
 					break;
 				case EOT:
+					console_printString("EOT\r\n");
 					n8vem_serio_putch(ACK);
 					return 0;
 				default: // Reading garbage?
+					console_printString("NAK\r\n");
 					flush();
 					n8vem_serio_putch(NAK);
 					break;
@@ -101,10 +117,8 @@ static uint8_t wait_getData(uint8_t *data, uint8_t secs) {
 static uint8_t xmodem_mngPkt(uint8_t *dest) {
 	uint8_t idx;
 
-	console_printString("\r\nMNG\r\n");
 	for (idx = 0; idx < 131; idx++) {
 		if (!wait_getData(&pkt_buf[idx], 10)) {
-				console_printString("\r\nFREAD\r\n");
 				return 0;
 		}
 	}
@@ -113,10 +127,12 @@ static uint8_t xmodem_mngPkt(uint8_t *dest) {
 		return 0;
 	}
 	
-	if (pkt_buf[0] == (expected_pkt - 1)) // Already got this...
+	if (pkt_buf[0] == (expected_pkt - 1)) { // Already got this...
 		return 2;
-	else if (pkt_buf[1] == expected_pkt) {
+	} else if (pkt_buf[0] == expected_pkt) {
 		if(checksum(&pkt_buf[2]) == pkt_buf[130]) { // OK!
+			memcpy(dest, pkt_buf+2, 128);
+
 			return 1;
 		}
 	}
