@@ -18,8 +18,8 @@ static uint8_t ser_initdata[SER_INITDATA_SIZE] = { 0x04, 0x44, // WR4: X16 clock
 												   0x03, 0xC1, // WR3: Enable reciever, No Auto Enable, Recieve 8 bits
 												   0x05, 0xEA, // WR5: Enable, Transmit 8 bits
 												   0x0B, 0x56, // WR11: Recieve/transmit clock = BRG
-												   //0x0C, 0x06, // WR12: BRate Low byte 19,200 Baud
-												   0x0C, 0x0E, // WR12: BRate Low byte 9,600 Baud
+												   0x0C, 0x06, // WR12: BRate Low byte 19,200 Baud
+												   //0x0C, 0x0E, // WR12: BRate Low byte 9,600 Baud
 												   //0x0C, 0x1E, // WR12: BRate Low byte 4,800 Baud
 												   //0x0C, 0x40, // WR12: BRate Low byte 2,400 Baud
 												   0x0D, 0x00, // WR13: High byte
