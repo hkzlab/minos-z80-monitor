@@ -23,8 +23,7 @@
 
 static const char title_str[] = MONITOR_TITLE MONITOR_VERSION"\a\r\n";
 
-static const char monitor_cmds[] =	"  O - OUT port  I - IN port  J - JP addr\r\n"
-									"  W - WR mem    R - RD mem   X - XModem\r\n"
+static const char monitor_cmds[] =	"  O - OUT I - IN  J - JP  W - WRM R - RDM X - XFR\r\n"
 									"  H - Help\r\n";
 
 static const char cmd_prompt[] = "] ";
@@ -46,8 +45,15 @@ void monitor_jmp(uint8_t *addr);
 
 /** Here lies the code **/
 void sys_init(void) {
-	// Clear Zero page
-	//memset((uint8_t*)0x00, 0x00, 0xFF);
+	//
+	// Initialize the function pointers
+	uint8_t f_counter = 0;
+	 *(uint16_t*)(__ROMADDR__ + 0x800 + f_counter) = (uint16_t)getchar;
+	 f_counter+=2;
+	 *(uint16_t*)(__ROMADDR__ + 0x800 + f_counter) = (uint16_t)putchar;
+	 f_counter+=2;
+	 *(uint16_t*)(__ROMADDR__ + 0x800 + f_counter) = (uint16_t)console_printString;
+	 f_counter+=2;
 
 #ifdef __USE_N8VEM_CONSOLE__
 //	n8vem_conio_init();
