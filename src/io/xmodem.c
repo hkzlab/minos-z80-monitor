@@ -25,35 +25,30 @@ static uint8_t xmodem_mngPkt(uint8_t *dest);
 static uint8_t expected_pkt;
 static uint8_t pkt_buf[131];
 
-static char str_buf[3];
 
 uint8_t xmodem_receive(uint8_t* dest) {
 	uint8_t retries = MAXERR;
 	uint8_t ch = 0;
-	uint8_t res;
 
 	expected_pkt = 0x01; // Setting to the first packet
-	str_buf[2] = 0;
 	
 	n8vem_serio_putch(NAK);
 	while(retries--) {
 		if(wait_getData(&ch, 10)) {
 			switch(ch) {
 				case SOH:
-					res = xmodem_mngPkt(dest);
-					if (res == 1) { // New block
-
-						dest+=128; // Next block
-						expected_pkt++;
-						n8vem_serio_putch(ACK);
-						retries = MAXERR;
-					} else if (res == 2) { // Repeated block
-						flush();
-						n8vem_serio_putch(ACK);
-						retries = MAXERR;
-					} else { // Garbage
-						flush();
-						n8vem_serio_putch(NAK);
+					switch(xmodem_mngPkt(dest)) { // Got SOH, time to parse the packet
+						case 1: // Got new block
+							dest+=128; // Next block
+							expected_pkt++;
+						case 2: // Re-Got the previous block
+							n8vem_serio_putch(ACK);
+							retries = MAXERR;
+							break;
+						default:
+							flush();
+							n8vem_serio_putch(NAK);
+							break;
 					}
 					break;
 				case EOT:
