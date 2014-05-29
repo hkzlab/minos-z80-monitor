@@ -18,7 +18,7 @@
 
 #define CMD_BUF_SIZE 12
 
-#define MONITOR_TITLE " MINOS "
+#define MONITOR_TITLE "\x1B[2J MINOS "
 #define MONITOR_VERSION "1.0"
 
 static const char title_str[] = MONITOR_TITLE MONITOR_VERSION"\a\r\n";
