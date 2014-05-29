@@ -16,20 +16,16 @@
 #include <io/xmodem.h>
 #endif
 
-#define CMD_BUF_SIZE 12
+#define CMD_BUF_SIZE 10
 
-#define MONITOR_TITLE "\x1B[2J MINOS "
-#define MONITOR_VERSION "1.0"
+#define MONITOR_HEAD "\x1B[2J MINOS 1.1\a\r\n"
 
-static const char title_str[] = MONITOR_TITLE MONITOR_VERSION"\a\r\n";
+#define MONITOR_CMD_PROMPT "\r\n] "
+#define MONITOR_ERR_MSG "\r\nERR\r\n"
 
-static const char monitor_cmds[] =	"  O - OUT I - IN  J - JP  W - WRM R - RDM X - XFR\r\n"
+static const char monitor_cmds[] =	"\r\n"
+									"  O - OUT I - IN  J - JP  W - WRM R - RDM X - XFR\r\n"
 									"  H - Help\r\n";
-
-static const char cmd_prompt[] = "] ";
-
-static const char cmd_err_msg[] = "ERR\r\n";
-
 
 static char cmd_buffer[CMD_BUF_SIZE];
 
@@ -71,13 +67,11 @@ void main(void) {
 	// Do basic system initialization
 	sys_init();
 
-	console_printString("\r\n");
-	console_printString(title_str);
-	console_printString(monitor_cmds);
+	console_printString(MONITOR_HEAD);
+	console_printString(monitor_cmds + 2);
 
 	while(1) { // Endless loop
-		console_printString("\r\n");
-		console_printString(cmd_prompt);
+		console_printString(MONITOR_CMD_PROMPT);
 
 		cmd_read_loop = 1;
 		buf_idx = 0;
@@ -100,8 +94,7 @@ void main(void) {
 					if(buf_idx >= CMD_BUF_SIZE) {
 						cmd_read_loop = 0;
 
-						console_printString("\r\n");
-						console_printString(cmd_err_msg);
+						console_printString(MONITOR_ERR_MSG);
 
 					} else {
 						cmd_buffer[buf_idx++] = ch;
@@ -128,7 +121,6 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 
 	switch(cmd[0]) {
 		case 'H': // Help
-			console_printString("\r\n");
 			console_printString(monitor_cmds);
 			break;
 #ifdef __USE_N8VEM_SERIO__
@@ -167,8 +159,7 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 			monitor_outp(monitor_parseU8(&cmd[1]), monitor_parseU8(&cmd[4]));
 			break;
 		default:
-			console_printString("\r\n");
-			console_printString(cmd_err_msg);
+			console_printString(MONITOR_ERR_MSG);
 			break;
 	}
 
