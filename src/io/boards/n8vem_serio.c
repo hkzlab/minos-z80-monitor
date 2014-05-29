@@ -81,9 +81,7 @@ char n8vem_serio_getch_nb(uint8_t *stat, uint8_t secs) {
 }
 
 void n8vem_serio_putch(char ch) {
-	while (1) {
-		if (SerIO_CTLA & 0x04) break;
-	}
+	while (!(SerIO_CTLA & 0x04));
 
 	SerIO_DATA = ch;
 	
