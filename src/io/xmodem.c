@@ -32,11 +32,8 @@ uint8_t xmodem_receive(uint8_t* dest) {
 	uint8_t ch = 0;
 	uint8_t res;
 
-
 	expected_pkt = 0x01; // Setting to the first packet
 	str_buf[2] = 0;
-	
-	console_printString("\r\n");
 	
 	n8vem_serio_putch(NAK);
 	while(retries--) {
@@ -45,10 +42,6 @@ uint8_t xmodem_receive(uint8_t* dest) {
 				case SOH:
 					res = xmodem_mngPkt(dest);
 					if (res == 1) { // New block
-						console_printString("ACK ");
-						monitor_printU8(expected_pkt, str_buf);
-						console_printString(str_buf);
-						console_printString("\r\n");
 
 						dest+=128; // Next block
 						expected_pkt++;
@@ -58,19 +51,16 @@ uint8_t xmodem_receive(uint8_t* dest) {
 						flush();
 						n8vem_serio_putch(ACK);
 						retries = MAXERR;
-						console_printString("RACK\r\n");
 					} else { // Garbage
 						flush();
 						n8vem_serio_putch(NAK);
-						console_printString("NAK\r\n");
 					}
 					break;
 				case EOT:
-					console_printString("EOT\r\n");
+					console_printString("\r\nEOT\r\n");
 					n8vem_serio_putch(ACK);
 					return 0;
 				default: // Reading garbage?
-					console_printString("NAK\r\n");
 					flush();
 					n8vem_serio_putch(NAK);
 					break;

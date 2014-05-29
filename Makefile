@@ -35,6 +35,7 @@ DLOC = 0xF850
 
 # Compilation / Assembly / Linking flags
 CUST_DEFINES = -D__USE_N8VEM_CONSOLE__ -D__USE_N8VEM_SERIO__
+CUST_DEFINES += -D__SERIAL_CONSOLE__
 CCC_FLAGS = -mz80 -D__SDCC__=1 -D__ROMADDR__=$(ROMADDR) -D__CLOC__=$(CLOC) -D__DLOC__=$(DLOC) $(CUST_DEFINES) $(INCLUDES)
 CAS_FLAGS = -plosff
 CLD_FLAGS = --code-loc $(CLOC) --data-loc $(DLOC) --code-size $(CSIZ) --no-std-crt0 --out-fmt-ihx
