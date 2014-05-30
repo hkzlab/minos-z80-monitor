@@ -44,11 +44,12 @@ char n8vem_serio_getch(void) {
 	SerIO_CTLA = 0x05; // Sel Reg 5
 	SerIO_CTLA = 0xEA; // Lower RTS
 
+/*
 	__asm
 		nop
 		nop
 	__endasm;
-
+*/
 	while(!(SerIO_CTLA & 0x01));
 
 	return SerIO_DATA;
@@ -59,12 +60,12 @@ char n8vem_serio_getch_nb(uint8_t *stat, uint8_t secs) {
 	
 	SerIO_CTLA = 0x05; // Sel Reg 5
 	SerIO_CTLA = 0xEA; // Lower RTS
-
+/*
 	__asm
 		nop
 		nop
 	__endasm;
-
+*/
 	while(secs--) { 
 		//cnt = 0xBBBB;
 		cnt = 0x258B;

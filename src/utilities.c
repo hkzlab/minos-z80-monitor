@@ -10,9 +10,9 @@ uint8_t monitor_parseU8(char *str) {
 //		if ((ch >= 0x61) && (ch <= 0x66))
 //			ch -= 0x20;
 
-		if ((ch >= 0x41) && (ch <= 0x46))
+		if ((ch >= 0x41) /*&& (ch <= 0x46)*/)
 			val |= (ch - 55) << (4 * idx); // Convert from ASCII to value
-		else if ((ch >= 0x30) && (ch <= 0x39))
+		else if (/*(ch >= 0x30) &&*/ (ch <= 0x39))
 			val |= (ch - 48) << (4 * idx); // Convert from ASCII to value
 	}
 
@@ -20,12 +20,7 @@ uint8_t monitor_parseU8(char *str) {
 }
 
 uint16_t monitor_parseU16(char *str) {
-	uint16_t val = 0;
-
-	val |= (monitor_parseU8(str+0) << 8);
-	val |= (monitor_parseU8(str+2) << 0);
-
-	return val;
+	return (monitor_parseU8(str+0) << 8) | (monitor_parseU8(str+2) << 0);
 }
 
 void monitor_printU8(uint8_t data, char *str) {

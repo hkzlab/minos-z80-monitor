@@ -18,13 +18,12 @@
 
 #define CMD_BUF_SIZE 10
 
-#define MONITOR_HEAD "\x1B[2J\x1B[1;1f MINOS 1.1\a\r\n"
-
+#define MONITOR_HEAD "\x1B[2J\x1B[1;1fMINOS 1.1\a\r\n"
 #define MONITOR_CMD_PROMPT "\r\n] "
 #define MONITOR_ERR_MSG "\r\nERR\r\n"
 
 static const char monitor_cmds[] =	"\r\n"
-									"  O - OUT I - IN  J - JP  W - WRM R - RDM X - XFR H - HLP\r\n";
+									" O - OUT I - IN  J - JP  W - WRM R - RDM X - XFR H - HLP\r\n";
 
 static char cmd_buffer[CMD_BUF_SIZE];
 
@@ -78,7 +77,7 @@ void main(void) {
 					if(buf_idx >= CMD_BUF_SIZE) {
 						cmd_read_loop = 0;
 
-						console_printString(MONITOR_ERR_MSG);
+						//console_printString(MONITOR_ERR_MSG);
 
 					} else {
 						cmd_buffer[buf_idx++] = ch;
