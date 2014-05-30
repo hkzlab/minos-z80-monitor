@@ -18,7 +18,7 @@
 
 #define CMD_BUF_SIZE 10
 
-#define MONITOR_HEAD "\x1B[2J MINOS 1.1\a\r\n"
+#define MONITOR_HEAD "\x1B[2J\x1B[1;1f MINOS 1.1\a\r\n"
 
 #define MONITOR_CMD_PROMPT "\r\n] "
 #define MONITOR_ERR_MSG "\r\nERR\r\n"
