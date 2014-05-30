@@ -2,31 +2,24 @@
 ;; Taken from SDCC
 
 	.module crt0
+	
 	.globl	_main
+	.globl  _putchar
+	.globl  _getchar
 
 	.globl  l__INITIALIZER
 	.globl  s__INITIALIZED
  	.globl  s__INITIALIZER
 
 	.area	_HEADER (ABS)
+
+	;; Setup the function pointers at the end of the EPROM
+	.org	0xF7FC
+	.dw		#_getchar
+	.dw		#_putchar
+
 	;; Reset vector
 	.org 	0xF000
-	jp	init
-	.org	0xF008
-	reti
-	.org	0xF010
-	reti
-	.org	0xF018
-	reti
-	.org	0xF020
-	reti
-	.org	0xF028
-	reti
-	.org	0xF030
-	reti
-	.org	0xF038
-	reti
-	.org	0xF040
 init:
 	;; Stack at the top of memory.
 	ld	sp,#0xFFFF
@@ -50,18 +43,9 @@ init:
 	.area   _HEAP
 
 	.area   _CODE
-__clock::
-	ld	a,#2
-	rst     0x08
-	ret
 
 _exit::
-	;; Exit - special code to the emulator
-	ld	a,#0
-	rst     0x08
-1$:
 	halt
-	jr	1$
 
 	.area   _GSINIT
 gsinit::

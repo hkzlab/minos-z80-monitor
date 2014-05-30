@@ -6,13 +6,6 @@
 static __sfr __at (CONIO_BASE+0x00) PropCIO_STAT;
 static __sfr __at (CONIO_BASE+0x01) PropCIO_DATA;
 
-/*
-void n8vem_conio_init(void) {
-	// Nothing to do...
-	return;
-}
-*/
-
 char n8vem_conio_getch(void) {
 	while(!(PropCIO_STAT & 0x02)); // Loop until we are ready to get the data...
 	return PropCIO_DATA;

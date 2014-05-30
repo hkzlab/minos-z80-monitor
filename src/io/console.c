@@ -13,10 +13,7 @@ void putchar(char ch);
 char getchar(void);
 
 void console_printString(char *str) {
-	while(*str != '\0') {
-		putchar(*str);
-		str++;
-	}
+	while(*str) putchar(*(str++));
 }
 
 void putchar(char ch) {

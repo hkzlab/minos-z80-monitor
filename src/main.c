@@ -24,8 +24,7 @@
 #define MONITOR_ERR_MSG "\r\nERR\r\n"
 
 static const char monitor_cmds[] =	"\r\n"
-									"  O - OUT I - IN  J - JP  W - WRM R - RDM X - XFR\r\n"
-									"  H - Help\r\n";
+									"  O - OUT I - IN  J - JP  W - WRM R - RDM X - XFR H - HLP\r\n";
 
 static char cmd_buffer[CMD_BUF_SIZE];
 
@@ -41,20 +40,6 @@ void monitor_jmp(uint8_t *addr);
 
 /** Here lies the code **/
 void sys_init(void) {
-	//
-	// Initialize the function pointers
-	uint8_t f_counter = 0;
-	 *(uint16_t*)(__ROMADDR__ + 0x800 + f_counter) = (uint16_t)getchar;
-	 f_counter+=2;
-	 *(uint16_t*)(__ROMADDR__ + 0x800 + f_counter) = (uint16_t)putchar;
-	 f_counter+=2;
-	 *(uint16_t*)(__ROMADDR__ + 0x800 + f_counter) = (uint16_t)console_printString;
-	 f_counter+=2;
-
-#ifdef __USE_N8VEM_CONSOLE__
-//	n8vem_conio_init();
-#endif
-
 #ifdef __USE_N8VEM_SERIO__
 	n8vem_serio_init();
 #endif
@@ -77,13 +62,12 @@ void main(void) {
 		buf_idx = 0;
 		while(cmd_read_loop) {
 			ch = getchar(); // Read a char
-
-			// Turn the letter uppercase!
-			if (ch >= 0x61 && ch <= 0x7A) {
-				ch -= 0x20;
-			}
-
 			putchar(ch); // Print it
+			
+			// Turn the letter uppercase for parsing purposes
+			if (ch >= 0x61/* && ch <= 0x7A*/) {
+				ch &= 0xDF;
+			}
 
 			switch(ch) {
 				case 0x0D: // CR
@@ -116,9 +100,6 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 
 	if (!idx) return;
 
-	memset(buff, ' ', sizeof(buff));
-	buff[sizeof(buff)-1] = 0;
-
 	switch(cmd[0]) {
 		case 'H': // Help
 			console_printString(monitor_cmds);
@@ -131,9 +112,12 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 		case 'I': // IN
 			val = monitor_inp(monitor_parseU8(&cmd[1]));
 			
-			// Copy the address
-			memcpy(buff, &cmd[1], 2);
+			// Prepare the string to print
 			monitor_printU8(val, &buff[4]);
+			buff[0] = cmd[1];
+			buff[1] = cmd[2];
+			buff[2] = buff[3] = ' ';
+			buff[6] = 0;
 
 			console_printString("\r\n");
 			console_printString(buff);
@@ -141,9 +125,11 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 		case 'R': // READ
 			val = *((uint8_t*)monitor_parseU16(&cmd[1]));
 
-			// Copy the address
+			// Prepare the string to print
 			memcpy(buff, &cmd[1], 4);
 			monitor_printU8(val, &buff[6]);
+			buff[4] = buff[5] = ' ';
+			buff[8] = 0;
 
 			console_printString("\r\n");
 			console_printString(buff);
@@ -174,8 +160,6 @@ void monitor_jmp(uint8_t *addr) __naked {
 		pop bc
 		pop hl
 		jp (hl)
-
-		ret
 	__endasm;
 }
 
