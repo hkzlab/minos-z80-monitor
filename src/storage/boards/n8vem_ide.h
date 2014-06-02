@@ -3,6 +3,6 @@
 
 #include <common_datatypes.h>
 
-void n8vem_ide_init(void);
+uint8_t n8vem_ide_init(void);
 
 #endif /* _N8VEMIDE_HEADER_ */

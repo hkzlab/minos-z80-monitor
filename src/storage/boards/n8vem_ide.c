@@ -9,9 +9,17 @@ static __sfr __at (IDE_BASE_ADDR+0x01) IDE_PortB;
 static __sfr __at (IDE_BASE_ADDR+0x02) IDE_PortC;
 
 // DEFINES:
+// SHD Config
+// IDE SHD register structure
+// LBA -> Enables LBA mode
+// DEV -> Device select
+// hea -> Head number
+// obs | LBA | obs | DEV | hea | hea | hea | hea
+#define IDE_SHD_CFG			0b11100000
+
 // 8255 I/O Modes
-#define MODE_8255_INPUT 0b10010010
-#define MODE_8255_OUTPUT 0b10000000
+#define MODE_8255_INPUT		0b10010010
+#define MODE_8255_OUTPUT	0b10000000
 
 // IDE lines
 #define IDE_LINE_A0		0x01
@@ -45,8 +53,10 @@ static __sfr __at (IDE_BASE_ADDR+0x02) IDE_PortC;
 #define IDE_CMD_SPDOWN	0xE0
 #define IDE_CMD_SPUP	0xE1
 
+uint8_t n8vem_ide_brd(uint8_t reg);
+void n8vem_ide_bwr(uint8_t reg, uint8_t val);
 
-void n8vem_ide_init(void) {
+uint8_t n8vem_ide_init(void) {
 	uint8_t delay = 0xFF;
 
 	// Set 8255 to input
@@ -60,6 +70,46 @@ void n8vem_ide_init(void) {
 			nop
 		__endasm;
 	};
+	delay = 0xFF;
 	
 	IDE_PortC = 0;
+
+	n8vem_ide_bwr(IDE_REG_SHD, IDE_SHD_CFG);
+	
+	while(delay--) {
+		__asm
+			nop
+		__endasm;
+		if (!n8vem_ide_brd(IDE_REG_STAT & 0x80)) return 0; // Check the busy flag is off
+	}
+
+	// If we got here, the init timed out
+	return 0xFF;
+}
+
+uint8_t n8vem_ide_brd(uint8_t reg) {
+	uint8_t reg_val = 0;
+
+	IDE_PortC = reg;
+	IDE_PortC = reg | IDE_LINE_RD;
+
+	reg_val = IDE_PortA;
+
+	IDE_PortC = reg;
+	IDE_PortC = 0;
+
+	return reg_val;
+}
+
+void n8vem_ide_bwr(uint8_t reg, uint8_t val) {
+	IDE_Ctrl = MODE_8255_OUTPUT;
+	
+	IDE_PortA  = val;
+
+	IDE_PortC = reg;
+	IDE_PortC = reg | IDE_LINE_WR;
+	IDE_PortC = reg;
+	IDE_PortC = 0;
+
+	IDE_Ctrl = MODE_8255_INPUT;
 }
