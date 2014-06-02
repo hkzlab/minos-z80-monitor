@@ -139,7 +139,6 @@ uint8_t n8vem_ide_block_rd(uint8_t *dest) {
 
 uint8_t n8vem_ide_waitNotBusy(void) {
 	uint8_t retries = 0xFF;
-	uint8_t val;
 
 	while(retries--) {
 		// Check DRIVE READY and DRIVE BUSY bits
