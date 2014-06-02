@@ -18,13 +18,15 @@
 
 #define CMD_BUF_SIZE 10
 
-#define MONITOR_HEAD "\x1B[2J\x1B[1;1fMINOS 1.1\a\r\n"
+#define MONITOR_HEAD "\x1B[2J\x1B[1;1fMINOS 1.1\r\n"
 #define MONITOR_CMD_PROMPT "\r\n] "
 #define MONITOR_ERR_MSG "\r\nERR\r\n"
 
 static const char monitor_cmds[] =	"\r\n"
 									" O - OUT I - IN  J - JP  W - WRM R - RDM X - XFR H - HLP\r\n";
 
+#define STR_BUFF_LEN 13
+static char mon_buff[STR_BUFF_LEN];
 static char cmd_buffer[CMD_BUF_SIZE];
 
 /******/
@@ -91,13 +93,13 @@ void main(void) {
 
 /***/
 
-
-#define STR_BUFF_LEN 11
 void monitor_parse_command(char *cmd, uint8_t idx) {
-	char buff[STR_BUFF_LEN];
 	uint8_t val;
 
 	if (!idx) return;
+
+	mon_buff[0] = '\r';
+	mon_buff[1] = '\n';
 
 	switch(cmd[0]) {
 		case 'H': // Help
@@ -112,26 +114,24 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 			val = monitor_inp(monitor_parseU8(&cmd[1]));
 			
 			// Prepare the string to print
-			monitor_printU8(val, &buff[4]);
-			buff[0] = cmd[1];
-			buff[1] = cmd[2];
-			buff[2] = buff[3] = ' ';
-			buff[6] = 0;
+			monitor_printU8(val, &mon_buff[6]);
+			mon_buff[2] = cmd[1];
+			mon_buff[3] = cmd[2];
+			mon_buff[4] = mon_buff[3] = ' ';
+			mon_buff[8] = 0;
 
-			console_printString("\r\n");
-			console_printString(buff);
+			console_printString(mon_buff);
 			break;
 		case 'R': // READ
 			val = *((uint8_t*)monitor_parseU16(&cmd[1]));
 
 			// Prepare the string to print
-			memcpy(buff, &cmd[1], 4);
-			monitor_printU8(val, &buff[6]);
-			buff[4] = buff[5] = ' ';
-			buff[8] = 0;
+			memcpy(mon_buff + 2, &cmd[1], 4);
+			monitor_printU8(val, &mon_buff[8]);
+			mon_buff[6] = mon_buff[7] = ' ';
+			mon_buff[10] = 0;
 
-			console_printString("\r\n");
-			console_printString(buff);
+			console_printString(mon_buff);
 			break;
 		case 'W': // WRITE
 			*((uint8_t*)monitor_parseU16(&cmd[1])) = monitor_parseU8(&cmd[6]);
