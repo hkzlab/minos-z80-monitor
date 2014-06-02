@@ -11,6 +11,10 @@
 #include <io/boards/n8vem_conio.h>
 #endif
 
+#ifdef __USE_N8VEM_IDE__
+#include <storage/boards/n8vem_ide.h>
+#endif
+
 #ifdef __USE_N8VEM_SERIO__
 #include <io/boards/n8vem_serio.h>
 #include <io/xmodem.h>
@@ -43,6 +47,10 @@ void monitor_jmp(uint8_t *addr);
 void sys_init(void) {
 #ifdef __USE_N8VEM_SERIO__
 	n8vem_serio_init();
+#endif
+
+#ifdef __USE_N8VEM_IDE__
+	n8vem_ide_init();
 #endif
 }
 

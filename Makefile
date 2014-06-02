@@ -34,7 +34,7 @@ CSIZ = 0x79C
 DLOC = 0xF800
 
 # Compilation / Assembly / Linking flags
-CUST_DEFINES = -D__USE_N8VEM_CONSOLE__ -D__USE_N8VEM_SERIO__
+CUST_DEFINES = -D__USE_N8VEM_CONSOLE__ -D__USE_N8VEM_SERIO__ -D__USE_N8VEM_IDE__
 CUST_DEFINES += -D__SERIAL_CONSOLE__
 CCC_FLAGS = --opt-code-size -mz80 -D__SDCC__=1 -D__ROMADDR__=$(ROMADDR) -D__CLOC__=$(CLOC) -D__DLOC__=$(DLOC) $(CUST_DEFINES) $(INCLUDES)
 CAS_FLAGS = -plosff
@@ -59,10 +59,12 @@ $(BIN_DIR)/$(TARGET).hex:	$(BIN_DIR)/$(TARGET).ihx
 
 $(BIN_DIR)/$(TARGET).ihx:	$(BIN_DIR)/crt0.rel $(BIN_DIR)/main.rel $(BIN_DIR)/xmodem.rel \
 							$(BIN_DIR)/console.rel $(BIN_DIR)/n8vem_serio.rel \
-							$(BIN_DIR)/n8vem_conio.rel $(BIN_DIR)/utilities.rel
+							$(BIN_DIR)/n8vem_conio.rel $(BIN_DIR)/utilities.rel \
+							$(BIN_DIR)/n8vem_ide.rel
 	$(CCC) $(CLD_FLAGS) $(CCC_FLAGS) $(BIN_DIR)/crt0.rel $(BIN_DIR)/main.rel $(BIN_DIR)/xmodem.rel \
 		$(BIN_DIR)/console.rel $(BIN_DIR)/n8vem_serio.rel \
 		$(BIN_DIR)/n8vem_conio.rel $(BIN_DIR)/utilities.rel \
+		$(BIN_DIR)/n8vem_ide.rel \
 		-o $(BIN_DIR)/$(TARGET).ihx
 
 $(BIN_DIR)/crt0.rel: $(SRC_DIR)/crt0.s
@@ -85,6 +87,9 @@ $(BIN_DIR)/n8vem_serio.rel: $(SRC_DIR)/io/boards/n8vem_serio.c
 
 $(BIN_DIR)/n8vem_conio.rel: $(SRC_DIR)/io/boards/n8vem_conio.c
 	$(CCC) $(CCC_FLAGS) -c -o $(BIN_DIR) $(SRC_DIR)/io/boards/n8vem_conio.c
+
+$(BIN_DIR)/n8vem_ide.rel: $(SRC_DIR)/storage/boards/n8vem_ide.c
+	$(CCC) $(CCC_FLAGS) -c -o $(BIN_DIR) $(SRC_DIR)/storage/boards/n8vem_ide.c
 
 clean:
 	rm $(BIN_DIR)/*
