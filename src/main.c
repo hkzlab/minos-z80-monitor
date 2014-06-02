@@ -24,10 +24,7 @@
 
 #define MONITOR_HEAD "\x1B[2J\x1B[1;1fMINOS 1.1\r\n"
 #define MONITOR_CMD_PROMPT "\r\n] "
-#define MONITOR_ERR_MSG "\r\nERR\r\n"
-
-static const char monitor_cmds[] =	"\r\n"
-									" O - OUT I - IN  J - JP  W - WRM R - RDM X - XFR H - HLP\r\n";
+#define MONITOR_ERR_MSG "\r\nE\r\n"
 
 #define STR_BUFF_LEN 13
 static char mon_buff[STR_BUFF_LEN];
@@ -62,7 +59,6 @@ void main(void) {
 	sys_init();
 
 	console_printString(MONITOR_HEAD);
-	console_printString(monitor_cmds + 2);
 
 	while(1) { // Endless loop
 		console_printString(MONITOR_CMD_PROMPT);
@@ -110,9 +106,6 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 	mon_buff[1] = '\n';
 
 	switch(cmd[0]) {
-		case 'H': // Help
-			console_printString(monitor_cmds);
-			break;
 #ifdef __USE_N8VEM_SERIO__
 		case 'X': // XModem transfer
 			xmodem_receive((uint8_t*)monitor_parseU16(&cmd[1]));

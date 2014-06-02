@@ -57,6 +57,8 @@ uint8_t n8vem_ide_reg_rd(uint8_t reg);
 void n8vem_ide_reg_wr(uint8_t reg, uint8_t val);
 uint8_t n8vem_ide_block_rd(uint8_t *dest);
 uint8_t n8vem_ide_waitNotBusy(void);
+uint8_t n8vem_ide_waitDRQ(void);
+void n8vem_ide_setLBAAddr(uint8_t sect, uint8_t head, uint16_t cyl);
 
 uint8_t n8vem_ide_init(void) {
 	uint8_t delay = 0xFF;
@@ -82,7 +84,7 @@ uint8_t n8vem_ide_init(void) {
 		__asm
 			nop
 		__endasm;
-		if (!n8vem_ide_reg_rd(IDE_REG_STAT & 0x80)) return 0; // Check the busy flag is off
+		if (!(n8vem_ide_reg_rd(IDE_REG_STAT) & 0x80)) return 0; // Check the busy flag is off
 	}
 
 	// If we got here, the init timed out
@@ -127,7 +129,6 @@ uint8_t n8vem_ide_block_rd(uint8_t *dest) {
 		dest[1] = IDE_PortA;
 
 		dest+=2;
-		
 	}
 		
 	IDE_PortC = IDE_REG_DATA;
@@ -148,6 +149,33 @@ uint8_t n8vem_ide_waitNotBusy(void) {
 	return 0xFF;
 }
 
-uint8_t n8vem_ide_read(uint8_t *dest, uint8_t sector, uint8_t head, uint16_t cyl) {
+uint8_t n8vem_ide_waitDRQ(void) {
+	uint8_t retries = 0xFF;
+
+	while(retries--) {
+		// Check DATA REQUEST and DRIVE BUSY bits
+		if((n8vem_ide_reg_rd(IDE_REG_STAT) & 0x88) == 0x08) return 0;
+	}
+
 	return 0xFF;
+}
+
+void n8vem_ide_setLBAAddr(uint8_t sect, uint8_t head, uint16_t cyl) {
+	n8vem_ide_reg_wr(IDE_REG_SEC, sect);
+	n8vem_ide_reg_wr(IDE_REG_SHD, head);
+	n8vem_ide_reg_wr(IDE_REG_CYLL, (uint8_t)cyl);
+	n8vem_ide_reg_wr(IDE_REG_CYLH, (uint8_t)(cyl >> 8));
+	n8vem_ide_reg_wr(IDE_REG_SECCNT, 1);
+}
+
+uint8_t n8vem_ide_read(uint8_t *dest, uint8_t sect, uint8_t head, uint16_t cyl) {
+	n8vem_ide_setLBAAddr(sect, head, cyl);
+
+	if(n8vem_ide_waitNotBusy()) return 0xFF;
+
+	n8vem_ide_reg_wr(IDE_REG_CMD, IDE_CMD_RD);
+	
+	if(n8vem_ide_waitDRQ()) return 0xFF;
+
+	return n8vem_ide_block_rd(dest);
 }
