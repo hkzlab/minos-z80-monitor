@@ -58,7 +58,7 @@ void n8vem_ide_reg_wr(uint8_t reg, uint8_t val);
 uint8_t n8vem_ide_block_rd(uint8_t *dest);
 uint8_t n8vem_ide_waitNotBusy(void);
 uint8_t n8vem_ide_waitDRQ(void);
-void n8vem_ide_setLBAAddr(uint8_t sect, uint8_t head, uint16_t cyl);
+void n8vem_ide_setLBAAddr(uint8_t sect, uint8_t head, uint8_t cyll, uint8_t cylh);
 
 uint8_t n8vem_ide_init(void) {
 	uint8_t delay = 0xFF;
@@ -160,16 +160,16 @@ uint8_t n8vem_ide_waitDRQ(void) {
 	return 0xFF;
 }
 
-void n8vem_ide_setLBAAddr(uint8_t sect, uint8_t head, uint16_t cyl) {
+void n8vem_ide_setLBAAddr(uint8_t sect, uint8_t head, uint8_t cyll, uint8_t cylh) {
 	n8vem_ide_reg_wr(IDE_REG_SEC, sect);
 	n8vem_ide_reg_wr(IDE_REG_SHD, head);
-	n8vem_ide_reg_wr(IDE_REG_CYLL, (uint8_t)cyl);
-	n8vem_ide_reg_wr(IDE_REG_CYLH, (uint8_t)(cyl >> 8));
+	n8vem_ide_reg_wr(IDE_REG_CYLL, cyll);
+	n8vem_ide_reg_wr(IDE_REG_CYLH, cylh);
 	n8vem_ide_reg_wr(IDE_REG_SECCNT, 1);
 }
 
-uint8_t n8vem_ide_read(uint8_t *dest, uint8_t sect, uint8_t head, uint16_t cyl) {
-	n8vem_ide_setLBAAddr(sect, head, cyl);
+uint8_t n8vem_ide_read(uint8_t *dest, uint8_t sect, uint8_t head, uint8_t cyll, uint8_t cylh) {
+	n8vem_ide_setLBAAddr(sect, head, cyll, cylh);
 
 	if(n8vem_ide_waitNotBusy()) return 0xFF;
 

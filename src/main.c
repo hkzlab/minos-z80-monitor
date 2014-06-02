@@ -20,7 +20,7 @@
 #include <io/xmodem.h>
 #endif
 
-#define CMD_BUF_SIZE 10
+#define CMD_BUF_SIZE 15
 
 #define MONITOR_HEAD "\x1B[2J\x1B[1;1fMINOS 1.1\r\n"
 #define MONITOR_CMD_PROMPT "\r\n] "
@@ -140,9 +140,11 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 		case 'J': // JP
 			monitor_jmp((uint8_t*)monitor_parseU16(&cmd[1]));
 			break;
-		
 		case 'O': // OUT
 			monitor_outp(monitor_parseU8(&cmd[1]), monitor_parseU8(&cmd[4]));
+			break;
+		case 'M': // Read first sector from drive
+			 n8vem_ide_read((uint8_t*)0x1000, 1, 1, 1, 0);
 			break;
 		default:
 			console_printString(MONITOR_ERR_MSG);

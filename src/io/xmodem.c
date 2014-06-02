@@ -53,7 +53,7 @@ uint8_t xmodem_receive(uint8_t* dest) {
 					break;
 				case EOT:
 					n8vem_serio_putch(ACK);
-					console_printString("\r\nEOT\r\n");
+					//console_printString("\r\nEOT\r\n");
 					return 0;
 				default: // Reading garbage?
 					flush();
