@@ -142,6 +142,9 @@ uint8_t n8vem_ide_waitNotBusy(void) {
 	uint8_t retries = 0xFF;
 
 	while(retries--) {
+		__asm
+			nop
+		__endasm;
 		// Check DRIVE READY and DRIVE BUSY bits
 		if((n8vem_ide_reg_rd(IDE_REG_STAT) & 0xC0) == 0x40) return 0;
 	}
@@ -153,6 +156,9 @@ uint8_t n8vem_ide_waitDRQ(void) {
 	uint8_t retries = 0xFF;
 
 	while(retries--) {
+		__asm
+			nop
+		__endasm;
 		// Check DATA REQUEST and DRIVE BUSY bits
 		if((n8vem_ide_reg_rd(IDE_REG_STAT) & 0x88) == 0x08) return 0;
 	}
