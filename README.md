@@ -11,4 +11,12 @@ Supported functions:
 * Jump execution to an address
 * XModem data upload
 
+Commands:
+Xaaaa		- Loads a binary file to memory at address "aaaa". EG: X5000
+Iaa			- INputs a byte from port address "aa". EG: I01
+Oaa,dd		- OUTputs byte "dd" to port "aa". EG: O01,AA
+Raaaa		- Reads a byte from memory address "aaaa". EG: R5000
+Waaaa,dd	- Writes byte "dd" to memory address "aaaa". EG: W5000,04
+Jaaaa		- Jumps execution to address "aaaa". EG: J3000
+
 Fabio Battaglia - hkzlabnet@gmail.com
