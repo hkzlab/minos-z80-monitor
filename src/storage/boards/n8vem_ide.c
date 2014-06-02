@@ -53,8 +53,9 @@ static __sfr __at (IDE_BASE_ADDR+0x02) IDE_PortC;
 #define IDE_CMD_SPDOWN	0xE0
 #define IDE_CMD_SPUP	0xE1
 
-uint8_t n8vem_ide_brd(uint8_t reg);
-void n8vem_ide_bwr(uint8_t reg, uint8_t val);
+uint8_t n8vem_ide_reg_rd(uint8_t reg);
+void n8vem_ide_reg_wr(uint8_t reg, uint8_t val);
+uint8_t n8vem_ide_block_rd(uint8_t *dest);
 
 uint8_t n8vem_ide_init(void) {
 	uint8_t delay = 0xFF;
@@ -74,20 +75,20 @@ uint8_t n8vem_ide_init(void) {
 	
 	IDE_PortC = 0;
 
-	n8vem_ide_bwr(IDE_REG_SHD, IDE_SHD_CFG);
+	n8vem_ide_reg_wr(IDE_REG_SHD, IDE_SHD_CFG);
 	
 	while(delay--) {
 		__asm
 			nop
 		__endasm;
-		if (!n8vem_ide_brd(IDE_REG_STAT & 0x80)) return 0; // Check the busy flag is off
+		if (!n8vem_ide_reg_rd(IDE_REG_STAT & 0x80)) return 0; // Check the busy flag is off
 	}
 
 	// If we got here, the init timed out
 	return 0xFF;
 }
 
-uint8_t n8vem_ide_brd(uint8_t reg) {
+uint8_t n8vem_ide_reg_rd(uint8_t reg) {
 	uint8_t reg_val = 0;
 
 	IDE_PortC = reg;
@@ -101,7 +102,7 @@ uint8_t n8vem_ide_brd(uint8_t reg) {
 	return reg_val;
 }
 
-void n8vem_ide_bwr(uint8_t reg, uint8_t val) {
+void n8vem_ide_reg_wr(uint8_t reg, uint8_t val) {
 	IDE_Ctrl = MODE_8255_OUTPUT;
 	
 	IDE_PortA  = val;
@@ -112,4 +113,29 @@ void n8vem_ide_bwr(uint8_t reg, uint8_t val) {
 	IDE_PortC = 0;
 
 	IDE_Ctrl = MODE_8255_INPUT;
+}
+
+uint8_t n8vem_ide_block_rd(uint8_t *dest) {
+	uint8_t count = 0xFF;
+
+	while(count--) {
+		IDE_PortC = IDE_REG_DATA;
+		IDE_PortC = IDE_REG_DATA | IDE_LINE_RD;
+
+		dest[0] = IDE_PortB;
+		dest[1] = IDE_PortA;
+
+		dest+=2;
+		
+	}
+		
+	IDE_PortC = IDE_REG_DATA;
+	IDE_PortC = 0;
+
+	if(n8vem_ide_reg_rd(IDE_REG_STAT) & 0x01) return 0xFF;
+	else return 0;
+}
+
+uint8_t n8vem_ide_read(uint8_t *dest, uint8_t sector, uint8_t head, uint16_t cyl) {
+	return 0xFF;
 }
