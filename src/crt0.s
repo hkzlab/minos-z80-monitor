@@ -4,8 +4,12 @@
 	.module crt0
 	
 	.globl	_main
+
 	.globl  _putchar
 	.globl  _getchar
+
+	.globl	_n8vem_ide_init
+	.globl	_n8vem_ide_read
 
 	.globl  l__INITIALIZER
 	.globl  s__INITIALIZED
@@ -14,7 +18,9 @@
 	.area	_HEADER (ABS)
 
 	;; Setup the function pointers at the end of the EPROM
-	.org	0xF7FC
+	.org	0xF7F8
+	.dw		#_n8vem_ide_init
+	.dw		#_n8vem_ide_read
 	.dw		#_getchar
 	.dw		#_putchar
 
