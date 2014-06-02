@@ -56,6 +56,7 @@ static __sfr __at (IDE_BASE_ADDR+0x02) IDE_PortC;
 uint8_t n8vem_ide_reg_rd(uint8_t reg);
 void n8vem_ide_reg_wr(uint8_t reg, uint8_t val);
 uint8_t n8vem_ide_block_rd(uint8_t *dest);
+uint8_t n8vem_ide_waitNotBusy(void);
 
 uint8_t n8vem_ide_init(void) {
 	uint8_t delay = 0xFF;
@@ -134,6 +135,18 @@ uint8_t n8vem_ide_block_rd(uint8_t *dest) {
 
 	if(n8vem_ide_reg_rd(IDE_REG_STAT) & 0x01) return 0xFF;
 	else return 0;
+}
+
+uint8_t n8vem_ide_waitNotBusy(void) {
+	uint8_t retries = 0xFF;
+	uint8_t val;
+
+	while(retries--) {
+		// Check DRIVE READY and DRIVE BUSY bits
+		if((n8vem_ide_reg_rd(IDE_REG_STAT) & 0xC0) == 0x40) return 0;
+	}
+
+	return 0xFF;
 }
 
 uint8_t n8vem_ide_read(uint8_t *dest, uint8_t sector, uint8_t head, uint16_t cyl) {
