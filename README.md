@@ -12,13 +12,13 @@ The monitor is coded in C (SDCC compiler) and assembly and is very small (under 
 * XModem data upload
 
 #Monitor commands:
-* Xaaaa		- Loads a binary file to memory at address "aaaa". EG: X5000
-* Iaa		- INputs a byte from port address "aa". EG: I01
-* Oaa,dd	- OUTputs byte "dd" to port "aa". EG: O01,AA
-* Raaaa		- Reads a byte from memory address "aaaa". EG: R5000
-* Waaaa,dd	- Writes byte "dd" to memory address "aaaa". EG: W5000,04
-* Jaaaa		- Jumps execution to address "aaaa". EG: J3000
-* B			- Copies in RAM (0x1000)  the content of sector 0 from the first drive in N8VEM IDE board then jumps the execution to it.
+* **X**_aaaa_		- Loads a binary file to memory at address "aaaa". EG: X5000
+* **I**_aa_		- INputs a byte from port address "aa". EG: I01
+* **O**__aa__,__dd__	- OUTputs byte "dd" to port "aa". EG: O01,AA
+* **R**__aaaa__		- Reads a byte from memory address "aaaa". EG: R5000
+* **W**__aaaa__,__dd__	- Writes byte "dd" to memory address "aaaa". EG: W5000,04
+* **J**__aaaa__		- Jumps execution to address "aaaa". EG: J3000
+* **B**			- Copies in RAM (0x1000)  the content of sector 0 from the first drive in N8VEM IDE board then jumps the execution to it.
 			 
 
 [Fabio Battaglia](https://plus.google.com/+FabioBattaglia) - hkzlabnet@gmail.com
