@@ -118,8 +118,8 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 			
 			// Prepare the string to print
 			monitor_printU8(val, &mon_buff[6]);
-			mon_buff[2] = cmd[2];
-			mon_buff[3] = cmd[3];
+			mon_buff[2] = cmd[1];
+			mon_buff[3] = cmd[2];
 			mon_buff[4] = mon_buff[5] = ' ';
 			mon_buff[8] = 0;
 
