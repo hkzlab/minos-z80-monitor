@@ -11,6 +11,7 @@ The MONITOR is meant to reside at address _0xF000_ and by default it communicate
 * Memory READ/WRITE
 * Jump execution to an address
 * XModem data upload
+* N8VEM IDE board booting
 
 ##Monitor commands:
 * **X**_aaaa_		- Loads a binary file to memory at address "aaaa". EG: X5000
