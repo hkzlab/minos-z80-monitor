@@ -20,6 +20,8 @@
 #include <io/xmodem.h>
 #endif
 
+#define BOOTSECT_DEST_ADDRESS 0x1000
+
 #define CMD_BUF_SIZE 15
 
 #define MONITOR_HEAD "\x1B[2J\x1B[1;1fMINOS 1.1\r\n"
@@ -116,9 +118,9 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 			
 			// Prepare the string to print
 			monitor_printU8(val, &mon_buff[6]);
-			mon_buff[2] = cmd[1];
-			mon_buff[3] = cmd[2];
-			mon_buff[4] = mon_buff[3] = ' ';
+			mon_buff[2] = cmd[2];
+			mon_buff[3] = cmd[3];
+			mon_buff[4] = mon_buff[5] = ' ';
 			mon_buff[8] = 0;
 
 			console_printString(mon_buff);
@@ -144,7 +146,8 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 			monitor_outp(monitor_parseU8(&cmd[1]), monitor_parseU8(&cmd[4]));
 			break;
 		case 'B': // Read first sector from drive in ram and jumps to it
-			 n8vem_ide_read((uint8_t*)0x1000, 1, 0, 0, 0);
+			 n8vem_ide_read((uint8_t*)BOOTSECT_DEST_ADDRESS, 1, 0, 0, 0);
+			 monitor_jmp((uint8_t*)BOOTSECT_DEST_ADDRESS);
 			break;
 		default:
 			console_printString(MONITOR_ERR_MSG);

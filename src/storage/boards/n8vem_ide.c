@@ -53,8 +53,6 @@ static __sfr __at (IDE_BASE_ADDR+0x02) IDE_PortC;
 #define IDE_CMD_SPDOWN	0xE0
 #define IDE_CMD_SPUP	0xE1
 
-uint8_t n8vem_ide_reg_rd(uint8_t reg);
-void n8vem_ide_reg_wr(uint8_t reg, uint8_t val);
 uint8_t n8vem_ide_block_rd(uint8_t *dest);
 uint8_t n8vem_ide_waitNotBusy(void);
 uint8_t n8vem_ide_waitDRQ(void);

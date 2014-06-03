@@ -5,11 +5,15 @@
 	
 	.globl	_main
 
+	;; Console I/O functions to export
 	.globl  _putchar
 	.globl  _getchar
 
+	;; IDE functions to export
 	.globl	_n8vem_ide_init
 	.globl	_n8vem_ide_read
+	.globl 	_n8vem_ide_reg_rd
+	.globl  _n8vem_ide_reg_wr
 
 	.globl  l__INITIALIZER
 	.globl  s__INITIALIZED
@@ -18,8 +22,10 @@
 	.area	_HEADER (ABS)
 
 	;; Setup the function pointers at the end of the EPROM
-	.org	0xF7F8
+	.org	0xF7F4
 	.dw		#_n8vem_ide_init
+	.dw		#_n8vem_ide_reg_rd
+	.dw		#_n8vem_ide_reg_wr
 	.dw		#_n8vem_ide_read
 	.dw		#_getchar
 	.dw		#_putchar
