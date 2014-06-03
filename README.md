@@ -22,7 +22,7 @@ The MONITOR is meant to reside at address _0xF000_ and by default it communicate
 * **B**			- Copies in RAM (0x1000)  the content of sector 0 from the first drive in N8VEM IDE board then jumps the execution to it.
 
 ##Function table:
-At the end of the EPROM, there is an address table for some useful functions that can be riutilized.
+At the end of the EPROM, there is an address table for some useful functions that can be reused by other code:
 * **0xF7F4** n8vem\_ide\_init
 * **0xF7F6** n8vem\_ide\_reg\_rd
 * **0xF7F8** n8vem\_ide\_reg\_wr
