@@ -18,5 +18,8 @@ Oaa,dd		- OUTputs byte "dd" to port "aa". EG: O01,AA
 Raaaa		- Reads a byte from memory address "aaaa". EG: R5000
 Waaaa,dd	- Writes byte "dd" to memory address "aaaa". EG: W5000,04
 Jaaaa		- Jumps execution to address "aaaa". EG: J3000
+B			- Copies in RAM (0x1000)  the content of sector 0 from the 
+			  first drive in N8VEM IDE board then jumps the execution to it.
+			 
 
 Fabio Battaglia - hkzlabnet@gmail.com
