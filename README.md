@@ -23,7 +23,7 @@ The MONITOR is meant to reside at address _0xF000_ and by default it communicate
 
 ##Function table:
 At the end of the EPROM, there is an address table for some useful functions that can be riutilized.
-* **0xF7F4** n8vem\_ide\_init()
+* **0xF7F4** n8vem\_ide\_init
 * **0xF7F6** n8vem\_ide\_reg\_rd
 * **0xF7F8** n8vem\_ide\_reg\_wr
 * **0xF7FA** n8vem\_ide\_read
