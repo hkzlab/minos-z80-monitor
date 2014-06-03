@@ -4,7 +4,7 @@ MINOS
 
 MINOS (stands for MINi OS) is a small ROM Monitor I wrote for the Ithaca Audio Z80 CPU card inside my S-100 computer.
 The monitor is coded in C (SDCC compiler) and assembly and is very small (under 2K) to fit on a 2716 EPROM.
-The MONITOR is meant to reside at address _0xF000_.
+The MONITOR is meant to reside at address _0xF000_ and by default it communicates through Serial port A of N8VEM SerialIO card, 19200bps, HW flow control.
 
 ##Supported functions:
 * Port IN/OUT
