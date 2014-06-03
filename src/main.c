@@ -143,8 +143,8 @@ void monitor_parse_command(char *cmd, uint8_t idx) {
 		case 'O': // OUT
 			monitor_outp(monitor_parseU8(&cmd[1]), monitor_parseU8(&cmd[4]));
 			break;
-		case 'M': // Read first sector from drive
-			 n8vem_ide_read((uint8_t*)0x1000, 1, 1, 1, 0);
+		case 'B': // Read first sector from drive in ram and jumps to it
+			 n8vem_ide_read((uint8_t*)0x1000, 1, 0, 0, 0);
 			break;
 		default:
 			console_printString(MONITOR_ERR_MSG);

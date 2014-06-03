@@ -125,8 +125,8 @@ uint8_t n8vem_ide_block_rd(uint8_t *dest) {
 		IDE_PortC = IDE_REG_DATA;
 		IDE_PortC = IDE_REG_DATA | IDE_LINE_RD;
 
-		dest[0] = IDE_PortB;
-		dest[1] = IDE_PortA;
+		dest[1] = IDE_PortB;
+		dest[0] = IDE_PortA;
 
 		dest+=2;
 	}
