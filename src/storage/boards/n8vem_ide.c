@@ -15,7 +15,8 @@ static __sfr __at (IDE_BASE_ADDR+0x02) IDE_PortC;
 // DEV -> Device select
 // hea -> Head number
 // obs | LBA | obs | DEV | hea | hea | hea | hea
-#define IDE_SHD_CFG			0b11100000
+//#define IDE_SHD_CFG			0b11100000
+#define IDE_SHD_CFG				0b10100000
 
 // 8255 I/O Modes
 #define MODE_8255_INPUT		0b10010010
@@ -166,7 +167,7 @@ uint8_t n8vem_ide_waitDRQ(void) {
 
 void n8vem_ide_setLBAAddr(uint8_t sect, uint8_t head, uint8_t cyll, uint8_t cylh) {
 	n8vem_ide_reg_wr(IDE_REG_SEC, sect);
-	n8vem_ide_reg_wr(IDE_REG_SHD, head);
+	n8vem_ide_reg_wr(IDE_REG_SHD, IDE_SHD_CFG | head);
 	n8vem_ide_reg_wr(IDE_REG_CYLL, cyll);
 	n8vem_ide_reg_wr(IDE_REG_CYLH, cylh);
 	n8vem_ide_reg_wr(IDE_REG_SECCNT, 1);
