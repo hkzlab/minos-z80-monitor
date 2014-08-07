@@ -1,5 +1,6 @@
 # Prefixes
-COMPILER_PREFIX = /opt/local/
+#COMPILER_PREFIX = /opt/local/
+COMPILER_PREFIX = /usr/
 COMPILER_LIBS = $(COMPILER_PREFIX)/share/sdcc/lib/z80/
 
 # Options
@@ -19,9 +20,8 @@ H2B = hex2bin
 ROMADDR = 0xF000
 
 # Tool flags
-# Pad the image to 2048 bytes
-H2B_FLAGS = -s F000 -l 800
-#H2B_FLAGS = -s F000 -l 400
+H2B_FLAGS = -s F000 
+#H2B_FLAGS = -s F000
 
 # Project directories
 SRC_DIR = src/
