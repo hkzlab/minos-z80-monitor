@@ -1,6 +1,5 @@
 # Prefixes
-#COMPILER_PREFIX = /opt/local/
-COMPILER_PREFIX = /usr/
+COMPILER_PREFIX = $(SDCC_PREFIX)
 COMPILER_LIBS = $(COMPILER_PREFIX)/share/sdcc/lib/z80/
 
 # Options
